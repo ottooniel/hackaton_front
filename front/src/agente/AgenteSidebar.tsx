@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { RESPUESTAS_AGENTE } from '../shared/mock';
 import type { RespuestaAgente } from '../shared/types';
 import { useApp } from '../state/useApp';
@@ -12,13 +12,12 @@ import { GraficaRespuesta } from './GraficaRespuesta';
 type Turno =
   | { id: number; rol: 'persona'; texto: string }
   | { id: number; rol: 'agente'; pensando: true }
-  | { id: number; rol: 'agente'; pensando: false; respuesta: RespuestaAgente; datos: DatosGrafica | null; specAbierta: boolean };
+  | { id: number; rol: 'agente'; pensando: false; respuesta: RespuestaAgente; datos: DatosGrafica | null };
 
 let siguiente = 1;
 
 export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
   const { publicable, consolidado, ir } = useApp();
-  const idBase = useId();
   const cerrarRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const [texto, setTexto] = useState('');
@@ -44,7 +43,7 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
     const visible = datos?.tipo === 'alerta' ? { ...respuesta, texto: datos.texto } : respuesta;
     setTurnos((prev) => prev.map((t) => (
       t.id === idAgente
-        ? { id: idAgente, rol: 'agente', pensando: false, respuesta: visible, datos, specAbierta: false }
+        ? { id: idAgente, rol: 'agente', pensando: false, respuesta: visible, datos }
         : t
     )));
     setOcupado(false);
@@ -127,22 +126,6 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
                       <span className={styles.fuente}>{t.respuesta.fuente === 'ia' ? 'Redactado por IA' : 'Texto de respaldo'}</span>
                     )}
                     {t.datos && <GraficaRespuesta datos={t.datos} />}
-                    {Object.keys(t.respuesta.spec).length > 0 && <button
-                      type="button"
-                      className={styles.specBtn}
-                      aria-expanded={t.specAbierta}
-                      aria-controls={`${idBase}-spec-${t.id}`}
-                      onClick={() => setTurnos((prev) => prev.map((item) => (
-                        item.id === t.id && item.rol === 'agente' && !item.pensando
-                          ? { ...item, specAbierta: !item.specAbierta }
-                          : item
-                      )))}
-                    >
-                      Ver qué le pidió el agente al motor
-                    </button>}
-                    {t.specAbierta && (
-                      <pre id={`${idBase}-spec-${t.id}`} className={styles.spec}>{JSON.stringify(t.respuesta.spec, null, 2)}</pre>
-                    )}
                   </article>
                 );
               })}
