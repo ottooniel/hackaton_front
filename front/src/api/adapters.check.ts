@@ -1,11 +1,12 @@
 // Chequeo de adapters con respuestas reales del backend (src/api/respuestas/): `node src/api/adapters.check.ts`
 import assert from 'node:assert/strict';
-import { aConsolidado, aErrores, aImpacto, aPuente, num } from './adapters.ts';
+import { aConsolidado, aErrores, aImpacto, aPuente, aRegistros, num } from './adapters.ts';
 import val from './respuestas/validacion.json' with { type: 'json' };
 import con from './respuestas/consolidado.json' with { type: 'json' };
 import esc from './respuestas/escenario.json' with { type: 'json' };
 import imp26 from './respuestas/impacto_ppto2026.json' with { type: 'json' };
 import pue from './respuestas/puente_herr.json' with { type: 'json' };
+import reg from './respuestas/registros_a03.json' with { type: 'json' };
 
 assert.equal(num('14350000.00'), 14_350_000);
 assert.throws(() => num('abc'));
@@ -37,5 +38,13 @@ assert.equal(ok.empresas[0].codigo, 'HERR');   // ordenadas por ROIC
 const p = aPuente(pue as never);
 assert.deepEqual(p.pasos.map((s) => s.etiqueta), ['EBIT Real 2025', 'Efecto operativo', 'Efecto cambiario', 'EBIT Ppto 2026']);
 assert.equal(p.pasos[3].valor, 2_422_365.22);
+
+const filas = aRegistros(reg as never);
+assert.equal(filas.length, 3);
+const r25 = filas.find((f) => f.version === 'real_2025');
+assert.equal(r25?.monto, 1_530_000);
+assert.equal(r25?.moneda, 'NIO');
+assert.equal(r25?.montoGrupo, null);   // NIO no tiene tasa
+assert.ok(errores.every((e) => (e.filaIds?.length ?? 0) > 0));
 
 console.info('adapters ok');

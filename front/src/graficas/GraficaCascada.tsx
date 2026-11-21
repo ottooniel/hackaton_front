@@ -1,5 +1,6 @@
 import type { PasoPuente } from '../shared/types';
 import { miles, millones } from '../shared/formato';
+import { Termino } from '../ui';
 import styles from './GraficaCascada.module.css';
 
 interface Props {
@@ -57,7 +58,11 @@ export function GraficaCascada({ pasos, min, span }: Props) {
           );
         })}
       </div>
-      <p className={styles.nota}>El eje empieza en {millones(min)} para que se vea el cambio.</p>
+      <p className={styles.nota}>
+        GTQ. El eje empieza en {millones(min)} para que se vea el cambio.{' '}
+        <Termino clave="efecto_operativo">Efecto operativo</Termino> y{' '}
+        <Termino clave="efecto_cambiario" alinear="der">efecto cambiario</Termino>.
+      </p>
     </figure>
   );
 }

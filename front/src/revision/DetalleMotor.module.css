@@ -1,0 +1,40 @@
+.motor { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px solid var(--borde); }
+.acciones { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+
+.enlace {
+  font: 600 13px/1.2 var(--fuente-texto);
+  background: none;
+  border: 0;
+  color: var(--azul);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  padding: 0;
+}
+.enlace:disabled { cursor: progress; color: var(--texto-3); }
+
+.nota { font-size: 13px; color: var(--texto-3); }
+
+.filas {
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--azul-suave);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+.filas li { display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+.origen { font-size: 12px; color: var(--texto-3); }
+
+.explicacion {
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border-left: 4px solid var(--amarillo);
+  background: var(--ag-chip-bg);
+}
+.fuente { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--texto-3); }

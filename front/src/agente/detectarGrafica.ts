@@ -3,7 +3,7 @@ import type { RespuestaAgente, TipoGrafica } from '../shared/types';
 import { frasesCortas } from './frasesCortas';
 
 /** Servicio del agente (docs/respuesta-front.md §1). VITE_AGENTE_URL="" lo apaga: solo respaldo, sin red. */
-const AGENTE_URL: string = import.meta.env.VITE_AGENTE_URL ?? 'https://hackaton-agente.onrender.com';
+export const AGENTE_URL: string = import.meta.env.VITE_AGENTE_URL ?? 'https://hackaton-agente.onrender.com';
 const ESPERA_MS = 8000;   // acordado con el back; si tarda más, queda el respaldo
 const PENSANDO_MS = 900;
 

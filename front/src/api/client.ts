@@ -1,8 +1,8 @@
 // Cliente del backend v3. Cualquier fallo o demora lanza error; quien llama cae al mock.
-import type { BarraDivergente, ConsolidadoGrupo, EmpresaCodigo, ErrorValidacion, Puente, VersionId } from '../shared/types';
+import type { BarraDivergente, ConsolidadoGrupo, EmpresaCodigo, ErrorValidacion, Puente, Registro, VersionId } from '../shared/types';
 import {
-  aConsolidado, aErrores, aImpacto, aPuente,
-  type ConsolidadoCrudo, type ImpactoCrudo, type PuenteCrudo, type ValidacionCruda,
+  aConsolidado, aErrores, aImpacto, aPuente, aRegistros,
+  type ConsolidadoCrudo, type ImpactoCrudo, type PuenteCrudo, type RegistroCrudo, type ValidacionCruda,
 } from './adapters';
 
 /** true → no se llama al backend. Se activa con VITE_USAR_MOCK=true en .env.local */
@@ -88,3 +88,7 @@ export const puente = async (
   empresa: string, desde: VersionId = 'real_2025', hasta: VersionId = 'ppto_2026', metrica: 'ebit' | 'ventas' = 'ebit',
 ): Promise<Puente> =>
   aPuente(await pedir<PuenteCrudo>(`/puente?empresa=${empresa}&metrica=${metrica}&desde=${desde}&hasta=${hasta}`));
+
+/** Filas de origen de una cifra o alerta: ids `archivo:hoja:fila[:version]`. */
+export const registros = async (ids: string[]): Promise<Registro[]> =>
+  aRegistros(await pedir<{ registros: RegistroCrudo[] }>(`/registros?ids=${encodeURIComponent(ids.join(','))}`));

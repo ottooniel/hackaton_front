@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ErrorValidacion } from '../shared/types';
 import { Boton } from '../ui';
 import { IcoAdv, IcoBloq, IcoOk } from '../ui/iconos';
+import { DetalleMotor } from './DetalleMotor';
 import css from './FilaError.module.css';
 
 interface Props {
@@ -11,9 +12,10 @@ interface Props {
   onAbrir: () => void;
   onCorregir: () => void;
   onAceptar: () => void;
+  conMotor: boolean;   // datos del backend: se pueden ver filas de origen y pedir explicación
 }
 
-export function FilaError({ error: e, resuelto, abierto, onAbrir, onCorregir, onAceptar }: Props) {
+export function FilaError({ error: e, resuelto, abierto, onAbrir, onCorregir, onAceptar, conMotor }: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const bloq = !resuelto && e.severidad === 'bloqueante';
   const estado = resuelto
@@ -55,6 +57,7 @@ export function FilaError({ error: e, resuelto, abierto, onAbrir, onCorregir, on
           <div className={css.bloque}><span className={css.etq}>Qué pasó</span><p>{e.quePaso}</p></div>
           <div className={css.bloque}><span className={css.etq}>Cómo se corrige</span><p>{e.comoSeCorrige}</p></div>
           <div className={css.bloque}><span className={css.etq}>Efecto</span><p>{e.efecto}</p></div>
+          {conMotor && <DetalleMotor error={e} />}
         </div>
       )}
     </article>

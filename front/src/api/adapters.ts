@@ -2,7 +2,7 @@
 // Montos: string con 2 decimales en GTQ ("14350000.00"). Fracciones: string de 4 decimales ("0.0963").
 // Los componentes reciben números; ROIC/WACC como fracción (el % lo pone shared/formato.ts).
 import type {
-  BarraDivergente, ConsolidadoGrupo, EmpresaCodigo, ErrorValidacion, FilaEmpresa, Puente, VersionId,
+  BarraDivergente, ConsolidadoGrupo, EmpresaCodigo, ErrorValidacion, FilaEmpresa, Puente, Registro, VersionId,
 } from '../shared/types';
 
 export function num(v: string | number): number {
@@ -51,6 +51,7 @@ export function aErrores(v: ValidacionCruda): ErrorValidacion[] {
       comoSeCorrige: a.comoSeCorrige,
       efecto: a.porQueImporta,
       filaId: a.filaIds[0],
+      filaIds: a.filaIds,
     };
   });
 }
@@ -153,3 +154,19 @@ export function aPuente(p: PuenteCrudo): Puente {
     ],
   };
 }
+
+// ---------- Registros (filas de origen) ----------
+
+export interface RegistroCrudo {
+  id: string; archivo: string; hoja: string; fila: number; empresa: string; version?: VersionId | null;
+  concepto: string; moneda: string; tasa: string | number | null; monto: string; montoGrupo: string | null;
+}
+
+export const aRegistros = (r: { registros: RegistroCrudo[] }): Registro[] =>
+  r.registros.map((x) => ({
+    id: x.id, archivo: x.archivo, hoja: x.hoja, fila: x.fila, empresa: x.empresa, version: x.version ?? null,
+    concepto: x.concepto, moneda: x.moneda,
+    tasa: x.tasa === null ? null : num(x.tasa),
+    monto: num(x.monto),
+    montoGrupo: x.montoGrupo === null ? null : num(x.montoGrupo),
+  }));

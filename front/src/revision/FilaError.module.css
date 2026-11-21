@@ -52,6 +52,7 @@
   padding-top: 12px;
   border-top: 1px solid var(--borde);
 }
+.detalle > :last-child:not(.bloque) { flex: 1 1 100%; }
 .bloque { flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
 .etq {
   font: 700 12px/1.2 var(--fuente-titulo);

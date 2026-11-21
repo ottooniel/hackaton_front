@@ -13,6 +13,22 @@ export interface ErrorValidacion {
   comoSeCorrige: string;
   efecto: string;
   filaId?: string;          // formato archivo:hoja:fila:versión
+  filaIds?: string[];       // todas las filas de origen (para GET /registros?ids=)
+}
+
+/** Fila normalizada del motor (GET /registros). Montos en número; montoGrupo en GTQ o null si la moneda no tiene tasa. */
+export interface Registro {
+  id: string;
+  archivo: string;
+  hoja: string;
+  fila: number;
+  empresa: string;
+  version: VersionId | null;
+  concepto: string;
+  moneda: string;
+  tasa: number | null;
+  monto: number;
+  montoGrupo: number | null;
 }
 
 export interface FilaEmpresa {

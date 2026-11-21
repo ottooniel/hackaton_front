@@ -8,7 +8,7 @@ import { ProgresoRevision } from './ProgresoRevision';
 import css from './Paso2.module.css';
 
 export function Paso2() {
-  const { errores, resueltos, pendientesBloq, publicable, bitacora, corregir, corregirTodo, aceptarDiferencia, ir } = useApp();
+  const { errores, resueltos, pendientesBloq, publicable, bitacora, fuente, corregir, corregirTodo, aceptarDiferencia, ir } = useApp();
   const [abierto, setAbierto] = useState<string | null>(null);
   const hayPorCorregir = errores.some((e) => !e.esIntercompania && !resueltos.includes(e.id));
 
@@ -34,6 +34,7 @@ export function Paso2() {
               onAbrir={() => setAbierto(abierto === e.id ? null : e.id)}
               onCorregir={() => corregir([e.id])}
               onAceptar={() => aceptarDiferencia(e.id)}
+              conMotor={fuente === 'api'}
             />
           </li>
         ))}
