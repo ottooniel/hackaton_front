@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { RESPUESTAS_AGENTE } from '../shared/mock';
 import type { RespuestaAgente } from '../shared/types';
 import { useApp } from '../state/useApp';
@@ -17,7 +17,8 @@ type Turno =
 let siguiente = 1;
 
 export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
-  const { publicable, ir } = useApp();
+  const { publicable, consolidado, ir } = useApp();
+  const idBase = useId();
   const cerrarRef = useRef<HTMLButtonElement>(null);
   const [texto, setTexto] = useState('');
   const [turnos, setTurnos] = useState<Turno[]>([]);
@@ -38,7 +39,7 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
       { id: idAgente, rol: 'agente', pensando: true },
     ]);
     const respuesta = await pedirRespuesta(limpio);
-    const datos = await datosDe(respuesta, limpio);
+    const datos = await datosDe(respuesta, limpio, consolidado);
     const visible = datos.tipo === 'alerta' ? { ...respuesta, texto: datos.texto } : respuesta;
     setTurnos((prev) => prev.map((t) => (
       t.id === idAgente
@@ -54,7 +55,15 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
   }
 
   return (
-    <aside className={styles.panel} role="dialog" aria-label="Pregúntale a tus números">
+    <>
+    <button type="button" className={styles.fondo} aria-label="Cerrar el agente" tabIndex={-1} onClick={onCerrar} />
+    <aside
+      className={styles.panel}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Pregúntale a tus números"
+      onKeyDown={(e) => { if (e.key === 'Escape') onCerrar(); }}
+    >
       <header className={styles.cabecera}>
         <div>
           <h2>Pregúntale a tus números</h2>
@@ -70,7 +79,7 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
           <p className={styles.bloqueoTitulo}>Todavía bloqueado</p>
           <p>Resuelve los errores bloqueantes para poder preguntar.</p>
           <p>El agente solo trabaja con cifras publicables.</p>
-          <Boton className={styles.ir} variante="amarillo" onClick={() => { ir(2); onCerrar(); }}>
+          <Boton className={styles.ir} variante="oscuro" onClick={() => { ir(2); onCerrar(); }}>
             Ir a revisar
           </Boton>
         </div>
@@ -101,10 +110,15 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
                 return (
                   <article key={t.id} className={styles.respuesta}>
                     {t.datos.tipo !== 'alerta' && <p>{t.respuesta.texto}</p>}
+                    {t.respuesta.fuente && (
+                      <span className={styles.fuente}>{t.respuesta.fuente === 'ia' ? 'Redactado por IA' : 'Texto de respaldo'}</span>
+                    )}
                     <GraficaRespuesta datos={t.datos} />
                     <button
                       type="button"
                       className={styles.specBtn}
+                      aria-expanded={t.specAbierta}
+                      aria-controls={`${idBase}-spec-${t.id}`}
                       onClick={() => setTurnos((prev) => prev.map((item) => (
                         item.id === t.id && item.rol === 'agente' && !item.pensando
                           ? { ...item, specAbierta: !item.specAbierta }
@@ -114,7 +128,7 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
                       Ver qué le pidió el agente al motor
                     </button>
                     {t.specAbierta && (
-                      <pre className={styles.spec}>{JSON.stringify(t.respuesta.spec, null, 2)}</pre>
+                      <pre id={`${idBase}-spec-${t.id}`} className={styles.spec}>{JSON.stringify(t.respuesta.spec, null, 2)}</pre>
                     )}
                   </article>
                 );
@@ -128,12 +142,13 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
               placeholder="Escribe tu pregunta"
               aria-label="Escribe tu pregunta"
             />
-            <Boton type="submit" variante="amarillo" tam="s" disabled={ocupado || !texto.trim()}>
+            <Boton type="submit" variante="oscuro" tam="s" disabled={ocupado || !texto.trim()}>
               Preguntar
             </Boton>
           </form>
         </>
       )}
     </aside>
+    </>
   );
 }

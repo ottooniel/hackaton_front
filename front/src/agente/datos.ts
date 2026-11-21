@@ -1,6 +1,6 @@
 import * as api from '../api/client';
-import { BARRAS_ROIC, CONSOLIDADO, IMPACTO_ERRORES, PUENTE_HERR } from '../shared/mock';
-import type { BarraDivergente, BarraRef, PasoPuente, RespuestaAgente } from '../shared/types';
+import { IMPACTO_ERRORES, PUENTE_HERR } from '../shared/mock';
+import type { BarraDivergente, BarraRef, ConsolidadoGrupo, PasoPuente, RespuestaAgente } from '../shared/types';
 
 const PUENTE_MIN = 2_200_000;
 const PUENTE_SPAN = 250_000;
@@ -37,9 +37,11 @@ const alertaMoneda = (texto: string): DatosGrafica => ({
   texto,
 });
 
-export async function datosDe(respuesta: RespuestaAgente, pregunta: string): Promise<DatosGrafica> {
+/** `consolidado` viene de useApp(): con backend son las cifras del dataset actual, sin backend el mock. */
+export async function datosDe(respuesta: RespuestaAgente, pregunta: string, consolidado: ConsolidadoGrupo): Promise<DatosGrafica> {
   if (respuesta.grafica === 'barras_ref') {
-    return { tipo: 'barras_ref', items: BARRAS_ROIC, referencia: CONSOLIDADO.wacc, max: 0.2 };
+    const items = consolidado.empresas.map((e) => ({ etiqueta: e.codigo, valor: e.roic }));
+    return { tipo: 'barras_ref', items, referencia: consolidado.wacc, max: 0.2 };
   }
 
   if (respuesta.grafica === 'divergente') {

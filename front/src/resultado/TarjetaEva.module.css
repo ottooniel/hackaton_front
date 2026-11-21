@@ -30,3 +30,5 @@
   color: var(--texto-2);
   font-size: 14px;
 }
+
+.negativa { color: var(--g-coral-tx); }

@@ -48,4 +48,5 @@ export interface RespuestaAgente {
   texto: string;            // frase corta en lenguaje llano
   grafica: TipoGrafica;
   spec: Record<string, unknown>; // lo que se muestra en "Ver qué le pidió el agente al motor"
+  fuente?: 'ia' | 'plantilla';   // de dónde salió `texto`; sin valor = respaldo por palabras clave del front
 }

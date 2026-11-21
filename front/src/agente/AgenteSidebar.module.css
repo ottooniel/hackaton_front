@@ -1,6 +1,16 @@
+.fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: 0;
+  padding: 0;
+  background: rgba(19, 21, 23, .5);
+  cursor: default;
+}
+
 .panel {
   position: fixed;
-  z-index: 30;
+  z-index: 50;
   top: 0;
   right: 0;
   width: 440px;
@@ -217,4 +227,11 @@
 
 @media (max-width: 640px) {
   .panel { width: 100%; }
+}
+
+.fuente {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-3);
 }

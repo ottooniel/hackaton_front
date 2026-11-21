@@ -41,14 +41,14 @@ export function Paso3() {
       <h2 className="vh">Resultado y preguntas</h2>
       <HeroAntesDespues ebitSinCorregir={ebitSinCorregir} ebitGrupo={ebitGrupo} />
       <div className={styles.rejilla}>
-        <TarjetaRoic roic={roicGrupo} wacc={consolidado.wacc} empresas={consolidado.empresas} />
+        <TarjetaRoic roic={roicGrupo} wacc={consolidado.wacc} />
         <TarjetaEva eva={evaGrupo} ebit={ebitGrupo} />
         <TarjetaTotal sumaEmpresas={sumaEmpresas} diferenciaIC={diferenciaIC} ebitGrupo={ebitGrupo} />
       </div>
       <article className={styles.invita}>
         <h3>¿Quieres entender algo más?</h3>
         <p>Pregúntale al agente. Te responde con una gráfica hecha para tu pregunta.</p>
-        <Boton variante="amarillo" onClick={abrirAgente}>
+        <Boton variante="oscuro" onClick={abrirAgente}>
           Abrir el agente
         </Boton>
       </article>

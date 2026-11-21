@@ -9,10 +9,10 @@ export function TarjetaEva({ eva, ebit }: { eva: number; ebit: number }) {
   return (
     <Tarjeta className={styles.tarjeta}>
       <h3 className={styles.titulo}><Termino clave="eva">EVA</Termino></h3>
-      <p className={styles.cifra}>{millones(eva)}</p>
+      <p className={`${styles.cifra} ${eva < 0 ? styles.negativa : ''}`}>{millones(eva)}</p>
       {noAlcanza && (
         <p className={styles.chip}>
-          <Chip tono="adv" icono={<IcoAdv />}>Hay utilidad, pero no alcanza</Chip>
+          <Chip tono="bloq" icono={<IcoAdv />}>Hay utilidad, pero no alcanza</Chip>
         </p>
       )}
       <p className={styles.nota}>

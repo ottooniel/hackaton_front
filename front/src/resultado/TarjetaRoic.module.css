@@ -28,3 +28,28 @@
   color: var(--texto-2);
   font-size: 14px;
 }
+
+.cifra { color: var(--azul); }
+
+.medidor {
+  position: relative;
+  height: 16px;
+  margin-top: 18px;
+  border-radius: var(--radio-pill);
+  background: var(--g-pista);
+}
+.barraOk, .barraBaja {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--radio-pill);
+}
+.barraOk { background: var(--g-verde); }
+.barraBaja { background: var(--g-coral); }
+.linea {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--tinta);
+}
