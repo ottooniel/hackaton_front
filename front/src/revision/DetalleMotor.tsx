@@ -7,6 +7,13 @@ import css from './DetalleMotor.module.css';
 
 const VERSION: Record<VersionId, string> = { real_2025: 'Real 2025', ppto_2026: 'Ppto 2026', reforecast_2026: 'Reforecast 2026' };
 
+/** "archivo:hoja:fila[:version]" → texto legible. Respaldo cuando /registros no trae la fila (balance, intercompañía). */
+function origenDeId(id: string) {
+  const [archivo, hoja, fila, version] = id.split(':');
+  const v = version && version in VERSION ? ` · ${VERSION[version as VersionId]}` : '';
+  return `${archivo} · ${hoja?.replace(/_/g, ' ')}, fila ${fila}${v}`;
+}
+
 type Carga<T> = { estado: 'nada' } | { estado: 'cargando' } | { estado: 'listo'; datos: T } | { estado: 'error' };
 
 // Solo con backend: las filas y la explicación usan los ids reales de /validacion.
@@ -57,7 +64,11 @@ export function DetalleMotor({ error: e }: { error: ErrorValidacion }) {
                 </li>
               ))}
             </ul>
-          ) : <p className={css.nota}>El motor no encontró filas para esta alerta.</p>
+          ) : (
+            <ul className={css.filas}>
+              {ids.map((id) => <li key={id}><span>{origenDeId(id)}</span></li>)}
+            </ul>
+          )
         )}
 
         {expl.estado === 'listo' && (
