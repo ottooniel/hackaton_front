@@ -1,0 +1,16 @@
+.slots { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.label { font-weight: 600; color: var(--texto-2); }
+.lista { display: contents; list-style: none; }
+
+.slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radio-pill);
+  border: 1.5px solid var(--borde);
+  background: #fff;
+  color: var(--texto-2);
+  font: 600 13px/1 var(--fuente-texto);
+}
+.ok { border-color: var(--ok-bd); background: var(--ok-bg); color: var(--ok-tx); }

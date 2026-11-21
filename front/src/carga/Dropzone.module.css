@@ -1,0 +1,25 @@
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 44px 24px;
+  border: 3px dashed var(--azul);
+  border-radius: var(--radio-card);
+  background: var(--azul-suave);
+  cursor: pointer;
+  position: relative;
+}
+.drop:hover, .encima { background: var(--azul-claro); }
+.drop:focus-within { outline: 3px solid var(--tinta); outline-offset: 3px; }
+.drop[aria-busy='true'] { cursor: progress; opacity: .7; }
+
+.titulo { font: 700 22px/1.2 var(--fuente-titulo); color: var(--azul); }
+.sub { color: var(--texto-2); }
+
+@media (max-width: 640px) {
+  .drop { padding: 28px 16px; }
+  .titulo { font-size: 18px; }
+}

@@ -12,6 +12,11 @@
   --tinta-2: #272A2E;
   --texto-2: #4B535A;     /* texto secundario */
   --texto-3: #5F666D;     /* notas pequeñas */
+  --azul-hover: #F2F5FA;  /* hover sobre blanco */
+  --azul-suave: #F4F7FC;  /* fondo de zona de carga, pestaña activa */
+  --azul-tx-claro: #DCE4F5; /* texto secundario sobre azul */
+  --forma-1: #33559F;     /* formas decorativas del header */
+  --forma-2: #3C61AD;
 
   /* Estados (siempre con icono + texto, nunca solo color) */
   --bloq-bg: #FDECEA;  --bloq-tx: #9B1C15;  --bloq-bd: #E9B3AF;
