@@ -1,0 +1,26 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 400 15px/1.5 var(--fuente-texto);
+  color: var(--tinta);
+  background: var(--fondo);
+}
+
+h1, h2, h3, h4, p, pre { margin: 0; }
+
+h1, h2, h3, h4 { font-family: var(--fuente-titulo); letter-spacing: .01em; }
+
+button { font: inherit; }
+
+:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; }
+
+/* Oculto a la vista, visible para lectores de pantalla y foco */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

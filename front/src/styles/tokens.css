@@ -1,0 +1,43 @@
+:root {
+  /* Interfaz */
+  --azul: #29478D;
+  --azul-osc: #1D3366;
+  --azul-claro: #E8EDF7;
+  --azul-borde: #B7C4E3;
+  --amarillo: #FBC500;
+  --amarillo-osc: #E0AF00;
+  --fondo: #EFF2F5;
+  --borde: #CDD5DA;
+  --tinta: #131517;
+  --tinta-2: #272A2E;
+  --texto-2: #4B535A;     /* texto secundario */
+  --texto-3: #5F666D;     /* notas pequeñas */
+
+  /* Estados (siempre con icono + texto, nunca solo color) */
+  --bloq-bg: #FDECEA;  --bloq-tx: #9B1C15;  --bloq-bd: #E9B3AF;
+  --adv-bg:  #FFF4CC;  --adv-tx:  #5E4500;  --adv-bd:  #F0CF5A;
+  --ok-bg:   #E6F4EC;  --ok-tx:   #17623F;  --ok-bd:   #A9D5BC;
+  --neutro-bg: #E4E8EB; --neutro-tx: #4B535A; --neutro-bd: #CDD5DA;
+
+  /* Gráficas (paleta propia, distinta a la interfaz) */
+  --g-verde: #0B5F5F;        /* supera / positivo */
+  --g-verde-2: #14908C;      /* efecto operativo */
+  --g-coral: #F08A4B;        /* debajo / negativo */
+  --g-coral-tx: #A8430F;     /* texto sobre fondo claro */
+  --g-violeta: #7B61C9;      /* efecto cambiario */
+  --g-pizarra: #3D4A57;      /* totales / base */
+  --g-pista: #E4E8EB;        /* fondo de la barra */
+
+  /* Agente (identidad propia: amarillo + negro) */
+  --ag-chip-bg: #FFF8DB;
+  --ag-chip-hover: #FFEFA8;
+
+  --radio-card: 16px;
+  --radio-fila: 14px;
+  --radio-pill: 999px;
+  --sombra-card: 0 1px 2px rgba(19,21,23,.06), 0 12px 32px rgba(41,71,141,.10);
+  --sombra-fab: 0 10px 28px rgba(19,21,23,.35);
+
+  --fuente-titulo: 'Montserrat', system-ui, sans-serif;
+  --fuente-texto: 'Inter', system-ui, sans-serif;
+}
