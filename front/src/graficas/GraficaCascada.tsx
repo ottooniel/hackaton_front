@@ -36,7 +36,7 @@ export function GraficaCascada({ pasos, min, span }: Props) {
 
   return (
     <figure className={styles.figura}>
-      <div className={styles.lienzo} style={{ height: ALTO }}>
+      <div className={styles.lienzo}>
         {barras.map((b) => {
           const base = Math.min(b.inicio, b.fin);
           const techo = Math.max(b.inicio, b.fin);

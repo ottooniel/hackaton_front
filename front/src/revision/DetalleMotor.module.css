@@ -12,7 +12,6 @@
   min-height: 44px;
   padding: 0;
 }
-.enlace:disabled { cursor: progress; color: var(--texto-3); }
 
 .nota { font-size: 13px; color: var(--texto-3); }
 
@@ -30,11 +29,3 @@
 .filas li { display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
 .origen { font-size: 12px; color: var(--texto-3); }
 
-.explicacion {
-  font-size: 14px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border-left: 4px solid var(--amarillo);
-  background: var(--ag-chip-bg);
-}
-.fuente { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--texto-3); }

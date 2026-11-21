@@ -12,7 +12,7 @@ interface Props {
   onAbrir: () => void;
   onCorregir: () => void;
   onAceptar: () => void;
-  conMotor: boolean;   // datos del backend: se pueden ver filas de origen y pedir explicación
+  conMotor: boolean;   // datos del backend: se pueden ver las filas de origen
 }
 
 export function FilaError({ error: e, resuelto, abierto, onAbrir, onCorregir, onAceptar, conMotor }: Props) {

@@ -5,7 +5,7 @@ Hackathon Open2 Build & Pitch (UVG) · Equipo 404 > 200 · Track 4, consolidaci�
 Una sola vista en tres pasos para cualquier rol financiero:
 
 1. **Carga**: subir el archivo de supuestos (`00_…`) y los 6 Excel de empresa, o probar con los datos del reto.
-2. **Revisa**: los errores que encontró el motor, con corrección guiada, filas de origen y explicación en lenguaje claro. El total del grupo no se publica mientras haya bloqueantes.
+2. **Revisa**: los errores que encontró el motor, con corrección guiada y filas de origen. El total del grupo no se publica mientras haya bloqueantes.
 3. **Entiende**: el resultado antes y después de corregir, y un agente que responde con gráficas.
 
 Los números los calcula el backend. La IA solo redacta y nunca toca una cifra.
@@ -56,7 +56,7 @@ Si el backend o el agente fallan, el front sigue con los datos de ejemplo sin mo
 src/
   shell/      header, stepper (barra inferior en móvil), pie
   carga/      paso 1
-  revision/   paso 2, bitácora, filas de origen y "Explícame esto"
+  revision/   paso 2, bitácora y filas de origen
   resultado/  paso 3
   agente/     botón flotante, sidebar, conexión al agente
   graficas/   barras con referencia, cascada, divergente

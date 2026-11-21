@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { registros } from '../api/client';
-import { explicarAlerta } from '../agente/explicar';
 import { miles } from '../shared/formato';
 import type { ErrorValidacion, Registro, VersionId } from '../shared/types';
 import css from './DetalleMotor.module.css';
@@ -16,10 +15,9 @@ function origenDeId(id: string) {
 
 type Carga<T> = { estado: 'nada' } | { estado: 'cargando' } | { estado: 'listo'; datos: T } | { estado: 'error' };
 
-// Solo con backend: las filas y la explicación usan los ids reales de /validacion.
+// Solo con backend: las filas usan los ids reales de /validacion.
 export function DetalleMotor({ error: e }: { error: ErrorValidacion }) {
   const [filas, setFilas] = useState<Carga<Registro[]>>({ estado: 'nada' });
-  const [expl, setExpl] = useState<Carga<string | null>>({ estado: 'nada' });
   const ids = e.filaIds ?? (e.filaId ? [e.filaId] : []);
 
   const verFilas = () => {
@@ -28,22 +26,12 @@ export function DetalleMotor({ error: e }: { error: ErrorValidacion }) {
     registros(ids).then((datos) => setFilas({ estado: 'listo', datos })).catch(() => setFilas({ estado: 'error' }));
   };
 
-  const explicar = () => {
-    setExpl({ estado: 'cargando' });
-    explicarAlerta(e.id).then((datos) => setExpl({ estado: 'listo', datos }));
-  };
-
   return (
     <div className={css.motor}>
       <div className={css.acciones}>
         {ids.length > 0 && (
           <button type="button" className={css.enlace} aria-expanded={filas.estado === 'listo'} onClick={verFilas}>
             {filas.estado === 'listo' ? 'Ocultar filas de origen' : 'Ver filas de origen'}
-          </button>
-        )}
-        {expl.estado !== 'listo' && (
-          <button type="button" className={css.enlace} disabled={expl.estado === 'cargando'} onClick={explicar}>
-            {expl.estado === 'cargando' ? 'Pensando…' : 'Explícame esto'}
           </button>
         )}
       </div>
@@ -69,12 +57,6 @@ export function DetalleMotor({ error: e }: { error: ErrorValidacion }) {
               {ids.map((id) => <li key={id}><span>{origenDeId(id)}</span></li>)}
             </ul>
           )
-        )}
-
-        {expl.estado === 'listo' && (
-          expl.datos
-            ? <p className={css.explicacion}>{expl.datos} <span className={css.fuente}>Redactado por IA</span></p>
-            : <p className={css.nota}>No pudimos generar la explicación ahora. Revisa «Qué pasó» y «Cómo se corrige».</p>
         )}
       </div>
     </div>
