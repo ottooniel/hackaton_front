@@ -1,0 +1,51 @@
+.hero {
+  padding: 28px 32px;
+  border-radius: var(--radio-card);
+  background: var(--azul);
+  color: white;
+  box-shadow: var(--sombra-card);
+}
+
+.kicker {
+  font-family: var(--fuente-titulo);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+}
+
+.antes {
+  margin-top: 6px;
+  font-family: var(--fuente-titulo);
+  font-size: 22px;
+  font-weight: 700;
+  text-decoration: line-through;
+  color: var(--azul-claro);
+}
+
+.ahora {
+  margin-top: 18px;
+  font-size: 15px;
+  color: var(--azul-claro);
+}
+
+.cifra {
+  margin-top: 4px;
+  font-family: var(--fuente-titulo);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.frase {
+  max-width: 46rem;
+  margin-top: 14px;
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 22px 18px; }
+  .cifra { font-size: 40px; }
+}

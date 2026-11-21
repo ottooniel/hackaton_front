@@ -1,0 +1,56 @@
+.figura { margin: 0; }
+
+.lienzo {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.eje {
+  position: relative;
+  width: 100%;
+  max-width: 72px;
+}
+
+.barra {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  border-radius: 6px;
+}
+
+.cifra {
+  font-family: var(--fuente-titulo);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.etiqueta {
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--texto-2);
+}
+
+.nota {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+@media (max-width: 640px) {
+  .lienzo { gap: 6px; }
+  .cifra, .etiqueta { font-size: 11px; }
+  .barra { left: 2px; right: 2px; }
+}

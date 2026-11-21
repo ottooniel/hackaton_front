@@ -1,0 +1,57 @@
+.figura { margin: 0; }
+
+.lista { display: flex; flex-direction: column; gap: 14px; }
+
+.nombre {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.eje {
+  display: grid;
+  grid-template-columns: 1fr 2px 1fr;
+  align-items: center;
+  min-height: 28px;
+}
+
+.lado { min-width: 0; height: 28px; display: flex; align-items: center; }
+
+.pista { flex: 1; min-width: 0; height: 100%; display: flex; }
+
+.lado:first-child .pista { justify-content: flex-end; }
+
+.centro { width: 2px; align-self: stretch; background: var(--tinta); }
+
+.neg,
+.pos {
+  height: 100%;
+  min-width: 8px;
+  border-radius: 999px;
+}
+
+.cifraNeg,
+.cifraPos {
+  flex: none;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cifraNeg { color: var(--g-coral-tx); }
+.cifraPos { color: var(--g-verde); }
+
+.neg {
+  justify-content: flex-start;
+  padding-left: 10px;
+  background: var(--g-coral);
+}
+
+.pos {
+  justify-content: flex-end;
+  padding-right: 10px;
+  background: var(--g-verde);
+}

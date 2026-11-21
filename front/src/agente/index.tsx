@@ -1,4 +1,13 @@
-// Esqueleto de Persona B. B reemplaza el contenido; el nombre `Agente` se mantiene.
+import { useApp } from '../state/useApp';
+import { AgenteFab } from './AgenteFab';
+import { AgenteSidebar } from './AgenteSidebar';
+
 export function Agente() {
-  return null;
+  const { agenteAbierto, abrirAgente, cerrarAgente } = useApp();
+  return (
+    <>
+      <AgenteFab onClick={abrirAgente} />
+      {agenteAbierto && <AgenteSidebar onCerrar={cerrarAgente} />}
+    </>
+  );
 }

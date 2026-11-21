@@ -1,0 +1,30 @@
+.tarjeta {
+  flex: 1 1 300px;
+  min-width: 0;
+  padding: 22px;
+  border-radius: var(--radio-card);
+  background: white;
+  box-shadow: var(--sombra-card);
+}
+
+.titulo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--azul);
+}
+
+.cifra {
+  margin-top: 8px;
+  font-family: var(--fuente-titulo);
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.nota {
+  margin: 10px 0 16px;
+  color: var(--texto-2);
+  font-size: 14px;
+}
