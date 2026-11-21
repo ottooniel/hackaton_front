@@ -1,0 +1,5 @@
+.tarjeta {
+  background: #fff;
+  border-radius: var(--radio-card);
+  box-shadow: var(--sombra-card);
+}

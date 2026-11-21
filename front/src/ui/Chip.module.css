@@ -1,0 +1,15 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radio-pill);
+  font: 600 12px/1.2 var(--fuente-texto);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.bloq   { background: var(--bloq-bg);   color: var(--bloq-tx);   border-color: var(--bloq-bd); }
+.adv    { background: var(--adv-bg);    color: var(--adv-tx);    border-color: var(--adv-bd); }
+.ok     { background: var(--ok-bg);     color: var(--ok-tx);     border-color: var(--ok-bd); }
+.info   { background: var(--azul-claro); color: var(--azul);     border-color: var(--azul-borde); }
+.neutro { background: var(--neutro-bg); color: var(--neutro-tx); border-color: var(--neutro-bd); }
