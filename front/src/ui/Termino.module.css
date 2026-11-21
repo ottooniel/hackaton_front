@@ -22,6 +22,7 @@
   top: calc(100% + 8px);
   z-index: 30;
   width: 260px;
+  max-width: calc(100vw - 32px);
   background: var(--tinta);
   color: #fff;
   font: 400 13px/1.45 var(--fuente-texto);
