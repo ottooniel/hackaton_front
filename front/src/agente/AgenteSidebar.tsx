@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { RESPUESTAS_AGENTE } from '../shared/mock';
 import type { RespuestaAgente } from '../shared/types';
 import { useApp } from '../state/useApp';
@@ -20,6 +20,7 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
   const { publicable, consolidado, ir } = useApp();
   const idBase = useId();
   const cerrarRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const [texto, setTexto] = useState('');
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [ocupado, setOcupado] = useState(false);
@@ -49,6 +50,17 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
     setOcupado(false);
   }
 
+  /** Escape cierra; Tab y Shift+Tab dan la vuelta dentro del panel (es un diálogo modal). */
+  function alTeclear(e: KeyboardEvent) {
+    if (e.key === 'Escape') { onCerrar(); return; }
+    if (e.key !== 'Tab' || !panelRef.current) return;
+    const enfocables = panelRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), [href]');
+    const primero = enfocables[0];
+    const ultimo = enfocables[enfocables.length - 1];
+    if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+    else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+  }
+
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     void enviar(texto);
@@ -58,11 +70,12 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
     <>
     <button type="button" className={styles.fondo} aria-label="Cerrar el agente" tabIndex={-1} onClick={onCerrar} />
     <aside
+      ref={panelRef}
       className={styles.panel}
       role="dialog"
       aria-modal="true"
       aria-label="Pregúntale a tus números"
-      onKeyDown={(e) => { if (e.key === 'Escape') onCerrar(); }}
+      onKeyDown={alTeclear}
     >
       <header className={styles.cabecera}>
         <div>
