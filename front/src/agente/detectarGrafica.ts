@@ -1,6 +1,7 @@
 import { RESPUESTAS_AGENTE } from '../shared/mock';
-import type { RespuestaAgente, TipoGrafica } from '../shared/types';
+import type { RespuestaAgente } from '../shared/types';
 import { frasesCortas } from './frasesCortas';
+import { planPorHerramientas, planPorPalabras, type Herramienta, type Plan } from './plan';
 
 /** Servicio del agente (docs/respuesta-front.md §1). VITE_AGENTE_URL="" lo apaga: solo respaldo, sin red. */
 export const AGENTE_URL: string = import.meta.env.VITE_AGENTE_URL ?? 'https://hackaton-agente.onrender.com';
@@ -10,34 +11,36 @@ const PENSANDO_MS = 900;
 /** Despierta el servicio (Render free tarda en arrancar) sin gastar cuota de Groq: cualquier GET basta. */
 export const despertarAgente = () => { if (AGENTE_URL) fetch(AGENTE_URL, { method: 'GET' }).catch(() => undefined); };
 
-const CASCADA = /herr|puente|sube|cambio|tasa|peso/i;
-const DIVERGENTE = /error|grave|signo|moneda|duplic/i;
+const FUERA_DE_TEMA = 'Solo respondo sobre las cifras del grupo: rentabilidad, errores o cambios entre versiones. Prueba con una de las preguntas sugeridas.';
 
-export function detectarGrafica(texto: string): RespuestaAgente {
-  const limpio = texto.trim();
-  const exacta = RESPUESTAS_AGENTE.find(
-    (r) => r.pregunta.toLowerCase() === limpio.toLowerCase(),
-  );
-  if (exacta) return exacta;
-  if (CASCADA.test(limpio)) return { ...RESPUESTAS_AGENTE[1], pregunta: limpio };
-  if (DIVERGENTE.test(limpio)) return { ...RESPUESTAS_AGENTE[2], pregunta: limpio };
-  return { ...RESPUESTAS_AGENTE[0], pregunta: limpio };
+/** Frase y "qué le pidió al motor" para un plan, con los datos que de verdad se van a consultar. */
+function armar(pregunta: string, plan: Plan, usadas: Herramienta[], texto?: string): RespuestaAgente {
+  const base = RESPUESTAS_AGENTE.find((r) => r.grafica === plan.grafica);
+  const empresa = plan.empresa ?? 'HERR';
+  const spec: Record<string, unknown> =
+    plan.grafica === 'cascada' ? { grafica: 'cascada', datos: `GET /puente?empresa=${empresa}&desde=real_2025&hasta=ppto_2026` }
+    : base ? { ...base.spec } : {};
+  if (usadas.length) spec.herramientasDelAgente = usadas;
+  const respaldo =
+    plan.grafica === null ? FUERA_DE_TEMA
+    : plan.grafica === 'cascada' && empresa !== 'HERR'
+      ? `Así cambia el EBIT de ${empresa} entre Real 2025 y Presupuesto 2026: primero el efecto del negocio y luego el del tipo de cambio.`
+      : base!.texto;
+  return { pregunta, texto: texto ?? respaldo, grafica: plan.grafica, empresa, spec, ...(texto ? { fuente: 'ia' as const } : {}) };
 }
 
-const esTipo = (v: unknown): v is TipoGrafica => v === 'barras_ref' || v === 'cascada' || v === 'divergente';
-
-interface RespuestaServicio { texto?: unknown; fuente?: unknown; grafica?: unknown }
+interface RespuestaServicio { texto?: unknown; fuente?: unknown; herramientasUsadas?: unknown }
 
 /**
- * POST {AGENTE_URL}/agente/preguntar → { texto (markdown), fuente: 'ia' | 'plantilla', … }.
- * Solo se usa `texto` si fuente === 'ia': la plantilla del agente puede traer un volcado de datos largo.
- * La gráfica y el spec los decide el front (o `grafica` si el agente la manda); los números de la gráfica salen del motor.
- * Sin URL, con error, plantilla o más de 8 s: queda la frase del respaldo sin mostrar error.
+ * POST {AGENTE_URL}/agente/preguntar → { texto (markdown), fuente: 'ia' | 'plantilla', herramientasUsadas }.
+ * - La gráfica sigue las herramientas que usó el agente; si no usó ninguna con gráfica, decide la pregunta.
+ * - Sin herramientas y sin tema reconocible: no salió de los números (p. ej. "resúmeme un libro"): no se muestra.
+ * - Plantilla, error o más de 8 s: respaldo por palabras clave. Los números de la gráfica siempre salen del motor.
  */
 export async function pedirRespuesta(pregunta: string): Promise<RespuestaAgente> {
   const inicio = Date.now();
-  const respaldo = detectarGrafica(pregunta);
-  let respuesta = respaldo;
+  const porPalabras = planPorPalabras(pregunta);
+  let respuesta = armar(pregunta, porPalabras, []);
   if (AGENTE_URL) {
     try {
       const r = await fetch(`${AGENTE_URL}/agente/preguntar`, {
@@ -48,20 +51,14 @@ export async function pedirRespuesta(pregunta: string): Promise<RespuestaAgente>
       });
       if (r.ok) {
         const data = (await r.json()) as RespuestaServicio;
+        const usadas = Array.isArray(data.herramientasUsadas) ? (data.herramientasUsadas as Herramienta[]) : [];
         const texto = data.fuente === 'ia' && typeof data.texto === 'string' ? frasesCortas(data.texto) : '';
-        if (texto) {
-          const grafica = esTipo(data.grafica) ? data.grafica : respaldo.grafica;
-          const base = grafica === respaldo.grafica ? respaldo : RESPUESTAS_AGENTE.find((x) => x.grafica === grafica) ?? respaldo;
-          respuesta = {
-            ...base,
-            pregunta,
-            texto,
-            fuente: 'ia',
-          };
+        if (texto && (usadas.length || porPalabras.grafica)) {
+          respuesta = armar(pregunta, planPorHerramientas(usadas, pregunta) ?? porPalabras, usadas, texto);
         }
       }
     } catch {
-      respuesta = respaldo;
+      /* queda el respaldo */
     }
   }
   const resta = PENSANDO_MS - (Date.now() - inicio);

@@ -62,7 +62,8 @@ export type TipoGrafica = 'barras_ref' | 'cascada' | 'divergente';
 export interface RespuestaAgente {
   pregunta: string;
   texto: string;            // frase corta en lenguaje llano
-  grafica: TipoGrafica;
+  grafica: TipoGrafica | null;    // null: sin gráfica (fuera de tema o respuesta solo de texto)
+  empresa?: EmpresaCodigo;        // para la cascada
   spec: Record<string, unknown>; // lo que se muestra en "Ver qué le pidió el agente al motor"
   fuente?: 'ia' | 'plantilla';   // de dónde salió `texto`; sin valor = respaldo por palabras clave del front
 }

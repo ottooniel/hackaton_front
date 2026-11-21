@@ -12,7 +12,7 @@ import { GraficaRespuesta } from './GraficaRespuesta';
 type Turno =
   | { id: number; rol: 'persona'; texto: string }
   | { id: number; rol: 'agente'; pensando: true }
-  | { id: number; rol: 'agente'; pensando: false; respuesta: RespuestaAgente; datos: DatosGrafica; specAbierta: boolean };
+  | { id: number; rol: 'agente'; pensando: false; respuesta: RespuestaAgente; datos: DatosGrafica | null; specAbierta: boolean };
 
 let siguiente = 1;
 
@@ -40,8 +40,8 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
       { id: idAgente, rol: 'agente', pensando: true },
     ]);
     const respuesta = await pedirRespuesta(limpio);
-    const datos = await datosDe(respuesta, limpio, consolidado);
-    const visible = datos.tipo === 'alerta' ? { ...respuesta, texto: datos.texto } : respuesta;
+    const datos = await datosDe(respuesta, consolidado);
+    const visible = datos?.tipo === 'alerta' ? { ...respuesta, texto: datos.texto } : respuesta;
     setTurnos((prev) => prev.map((t) => (
       t.id === idAgente
         ? { id: idAgente, rol: 'agente', pensando: false, respuesta: visible, datos, specAbierta: false }
@@ -122,12 +122,12 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
                 }
                 return (
                   <article key={t.id} className={styles.respuesta}>
-                    {t.datos.tipo !== 'alerta' && <p>{t.respuesta.texto}</p>}
+                    {t.datos?.tipo !== 'alerta' && <p>{t.respuesta.texto}</p>}
                     {t.respuesta.fuente && (
                       <span className={styles.fuente}>{t.respuesta.fuente === 'ia' ? 'Redactado por IA' : 'Texto de respaldo'}</span>
                     )}
-                    <GraficaRespuesta datos={t.datos} />
-                    <button
+                    {t.datos && <GraficaRespuesta datos={t.datos} />}
+                    {Object.keys(t.respuesta.spec).length > 0 && <button
                       type="button"
                       className={styles.specBtn}
                       aria-expanded={t.specAbierta}
@@ -139,7 +139,7 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
                       )))}
                     >
                       Ver qué le pidió el agente al motor
-                    </button>
+                    </button>}
                     {t.specAbierta && (
                       <pre id={`${idBase}-spec-${t.id}`} className={styles.spec}>{JSON.stringify(t.respuesta.spec, null, 2)}</pre>
                     )}

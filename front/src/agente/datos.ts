@@ -2,8 +2,6 @@ import * as api from '../api/client';
 import { IMPACTO_ERRORES, PUENTE_HERR } from '../shared/mock';
 import type { BarraDivergente, BarraRef, ConsolidadoGrupo, PasoPuente, RespuestaAgente } from '../shared/types';
 
-const PUENTE_MIN = 2_200_000;
-const PUENTE_SPAN = 250_000;
 const IMPACTO_MAX = 16.49;
 
 export type DatosGrafica =
@@ -12,8 +10,15 @@ export type DatosGrafica =
   | { tipo: 'divergente'; items: BarraDivergente[]; max: number }
   | { tipo: 'alerta'; titulo: string; texto: string };
 
-function empresaPuente(pregunta: string) {
-  return /\bconc\b/i.test(pregunta) && !/\bherr\b/i.test(pregunta) ? 'CONC' : 'HERR';
+/** Eje de la cascada según los pasos de cada empresa: margen de 40% del cambio arriba y abajo. */
+function cascada(pasos: PasoPuente[]): DatosGrafica {
+  let nivel = 0;
+  const niveles = pasos.map((p) => (nivel = p.tipo === 'total' ? p.valor : nivel + p.valor));
+  const lo = Math.min(...niveles);
+  const hi = Math.max(...niveles);
+  const margen = (hi - lo) * 0.4 || Math.abs(hi) * 0.05 || 1;
+  const min = Math.floor((lo - margen) / 10_000) * 10_000;
+  return { tipo: 'cascada', pasos, min, span: hi + margen - min };
 }
 
 function textoAlerta(detalle: Record<string, unknown>, mensaje: string) {
@@ -27,9 +32,6 @@ function textoAlerta(detalle: Record<string, unknown>, mensaje: string) {
   return mensaje;
 }
 
-const puenteEjemplo = (): DatosGrafica => ({
-  tipo: 'cascada', pasos: PUENTE_HERR.pasos, min: PUENTE_MIN, span: PUENTE_SPAN,
-});
 
 const alertaMoneda = (texto: string): DatosGrafica => ({
   tipo: 'alerta',
@@ -38,7 +40,8 @@ const alertaMoneda = (texto: string): DatosGrafica => ({
 });
 
 /** `consolidado` viene de useApp(): con backend son las cifras del dataset actual, sin backend el mock. */
-export async function datosDe(respuesta: RespuestaAgente, pregunta: string, consolidado: ConsolidadoGrupo): Promise<DatosGrafica> {
+export async function datosDe(respuesta: RespuestaAgente, consolidado: ConsolidadoGrupo): Promise<DatosGrafica | null> {
+  if (!respuesta.grafica) return null;
   if (respuesta.grafica === 'barras_ref') {
     const items = consolidado.empresas.map((e) => ({ etiqueta: e.codigo, valor: e.roic }));
     return { tipo: 'barras_ref', items, referencia: consolidado.wacc, max: 0.2 };
@@ -57,23 +60,19 @@ export async function datosDe(respuesta: RespuestaAgente, pregunta: string, cons
     return { tipo: 'divergente', items: IMPACTO_ERRORES, max: IMPACTO_MAX };
   }
 
-  const empresa = empresaPuente(pregunta);
+  const empresa = respuesta.empresa ?? 'HERR';
+  const sinPuente = alertaMoneda(`No se pudo calcular el puente de ${empresa} ahora.`);
   if (api.USAR_MOCK) {
-    return empresa === 'CONC'
-      ? alertaMoneda('CONC mezcla monedas en sus filas. Hay que corregir esa alerta antes de ver el puente.')
-      : puenteEjemplo();
+    if (empresa === 'CONC') return alertaMoneda('CONC mezcla monedas en sus filas. Hay que corregir esa alerta antes de ver el puente.');
+    return empresa === 'HERR' ? cascada(PUENTE_HERR.pasos) : sinPuente;
   }
 
   try {
-    const puente = await api.puente(empresa);
-    return { tipo: 'cascada', pasos: puente.pasos, min: PUENTE_MIN, span: PUENTE_SPAN };
+    return cascada((await api.puente(empresa)).pasos);
   } catch (error) {
     if (error instanceof api.ErrorApi && error.codigo === 'MONEDA_MIXTA') {
       return alertaMoneda(textoAlerta(error.detalle, error.message));
     }
-    if (empresa === 'CONC') {
-      return alertaMoneda('No se pudo calcular el puente de CONC.');
-    }
-    return puenteEjemplo();
+    return empresa === 'HERR' ? cascada(PUENTE_HERR.pasos) : sinPuente;
   }
 }
