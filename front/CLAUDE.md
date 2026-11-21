@@ -65,7 +65,7 @@ src/
 - Textos en español llano, sin siglas sin explicar. Decir "simulación de escenarios", nunca "predicción". Los textos oficiales están en `docs/contenido.md`.
 - Backend: `https://hackaton-back-7z3l.onrender.com/api`. Contrato en `docs/API del motor de consolidación — guía para el front.md` y `docs/respuesta-front.md`. Si el backend falla, caer al mock sin mostrar un error técnico (`VITE_USAR_MOCK=true` fuerza el mock).
 - `/upload` y `/reset` cambian los datos para todos. Render tarda ~30 s en despertar.
-- Agente IA: servicio aparte (`docs/agente-ia.md`), URL en `VITE_AGENTE_URL`. Solo se toma su `texto`; la gráfica la elige el front (`detectarGrafica`) y los números salen del motor. Sin URL o si tarda más de 8 s, queda el respaldo por palabras clave.
+- Agente IA: `https://hackaton-agente.onrender.com` (`POST /agente/preguntar`, sin `/api`), configurable con `VITE_AGENTE_URL`. Solo se toma su `texto` si `fuente === 'ia'`; la gráfica la elige el front (`detectarGrafica`) y los números salen del motor. Con plantilla, error o más de 8 s, queda el respaldo por palabras clave. La cuota de Groq es mínima: no probar el agente sin necesidad.
 
 ## Cómo trabajar
 

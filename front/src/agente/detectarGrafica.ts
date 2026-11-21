@@ -2,10 +2,13 @@ import { RESPUESTAS_AGENTE } from '../shared/mock';
 import type { RespuestaAgente, TipoGrafica } from '../shared/types';
 import { frasesCortas } from './frasesCortas';
 
-/** URL del servicio del agente (agente-ia.md). Sin valor → solo respaldo por palabras clave, sin red. */
-const AGENTE_URL: string | undefined = import.meta.env.VITE_AGENTE_URL;
+/** Servicio del agente (docs/respuesta-front.md §1). VITE_AGENTE_URL="" lo apaga: solo respaldo, sin red. */
+const AGENTE_URL: string = import.meta.env.VITE_AGENTE_URL ?? 'https://hackaton-agente.onrender.com';
 const ESPERA_MS = 8000;   // acordado con el back; si tarda más, queda el respaldo
 const PENSANDO_MS = 900;
+
+/** Despierta el servicio (Render free tarda en arrancar) sin gastar cuota de Groq: cualquier GET basta. */
+export const despertarAgente = () => { if (AGENTE_URL) fetch(AGENTE_URL, { method: 'GET' }).catch(() => undefined); };
 
 const CASCADA = /herr|puente|sube|cambio|tasa|peso/i;
 const DIVERGENTE = /error|grave|signo|moneda|duplic/i;
@@ -26,9 +29,10 @@ const esTipo = (v: unknown): v is TipoGrafica => v === 'barras_ref' || v === 'ca
 interface RespuestaServicio { texto?: unknown; fuente?: unknown; grafica?: unknown }
 
 /**
- * POST {VITE_AGENTE_URL}/agente/preguntar → { texto (markdown), fuente: 'ia' | 'plantilla', … }.
+ * POST {AGENTE_URL}/agente/preguntar → { texto (markdown), fuente: 'ia' | 'plantilla', … }.
+ * Solo se usa `texto` si fuente === 'ia': la plantilla del agente puede traer un volcado de datos largo.
  * La gráfica y el spec los decide el front (o `grafica` si el agente la manda); los números de la gráfica salen del motor.
- * Si no hay URL, falla o tarda más de 8 s, queda la frase del respaldo sin mostrar error.
+ * Sin URL, con error, plantilla o más de 8 s: queda la frase del respaldo sin mostrar error.
  */
 export async function pedirRespuesta(pregunta: string): Promise<RespuestaAgente> {
   const inicio = Date.now();
@@ -44,7 +48,7 @@ export async function pedirRespuesta(pregunta: string): Promise<RespuestaAgente>
       });
       if (r.ok) {
         const data = (await r.json()) as RespuestaServicio;
-        const texto = typeof data.texto === 'string' ? frasesCortas(data.texto) : '';
+        const texto = data.fuente === 'ia' && typeof data.texto === 'string' ? frasesCortas(data.texto) : '';
         if (texto) {
           const grafica = esTipo(data.grafica) ? data.grafica : respaldo.grafica;
           const base = grafica === respaldo.grafica ? respaldo : RESPUESTAS_AGENTE.find((x) => x.grafica === grafica) ?? respaldo;
@@ -52,7 +56,7 @@ export async function pedirRespuesta(pregunta: string): Promise<RespuestaAgente>
             ...base,
             pregunta,
             texto,
-            fuente: data.fuente === 'ia' || data.fuente === 'plantilla' ? data.fuente : undefined,
+            fuente: 'ia',
           };
         }
       }

@@ -2,7 +2,7 @@
 
 Para: front (Otto y Carlos) · De: back (Steven) · 21 nov 2026
 
-Gracias por el detalle. Ya está desplegado en `https://hackaton-back-7z3l.onrender.com/api` todo lo que pedían del back (secciones 3, 5 y 6). Abajo va cada respuesta, en el mismo orden que su documento.
+Gracias por el detalle. Ya está desplegado en `https://hackaton-back-7z3l.onrender.com/api` todo lo que pedían del back (secciones 3, 5 y 6), y el agente IA está en `https://hackaton-agente.onrender.com` (sección 1). Abajo va cada respuesta, en el mismo orden que su documento.
 
 **Novedades en la API**
 
@@ -11,20 +11,43 @@ Gracias por el detalle. Ya está desplegado en `https://hackaton-back-7z3l.onren
 | Nuevo | `POST /reset` | Vuelve al dataset del reto. Responde `{ "ok": true, "totalRegistros": 213 }` |
 | Nuevo campo | `/consolidado` y `/escenario` | `wacc` (fracción), `ebitSinCorregir` (monto) y `empresas[X].moneda` |
 | Cambio | `POST /escenario` con `"todas"` | Aplica solo las correcciones de la versión pedida. Real 2025 → `["A-03", "A-05", "A-07"]` |
+| Nuevo servicio | `https://hackaton-agente.onrender.com` | Agente IA: `/agente/preguntar` y `/api/explicar` |
 
 ---
 
 ## 1. Agente IA
 
-El agente vive en la rama `agente` y todavía no está en `main` ni desplegado. Estas respuestas salen de su código y de `agente-ia.md`; lo que cambie lo coordinamos con quien lo está trabajando.
+El agente ya está desplegado en **`https://hackaton-agente.onrender.com`**, con CORS abierto y conectado al backend real de Render. El código vive en la rama `agente` (lo mantiene Elmer); cada push a esa rama lo redespliega.
 
-1. **URL pública:** todavía no hay, solo corre en `localhost:3001`. El plan es un segundo servicio en Render. Su servidor ya tiene CORS abierto. Les pasamos la URL cuando esté.
-2. **Backend real:** el código soporta `FUENTE=http`, pero `.env.example` trae `mock`. En el deploy irá `FUENTE=http` con `BACKEND_URL=https://hackaton-back-7z3l.onrender.com/api`. El impacto por alerta ya funciona en modo `http`: lo pendiente era solo para el mock.
-3. **Campo `grafica`:** todavía no existe. Lo anotamos. Mientras tanto, sigan con su detección por palabras clave.
-4. **8 s:** nos parece bien. Las preguntas puntuales tardan ~4 s. Si se agota la cuota, el agente espera hasta 30 s y reintenta, así que en ese caso caerán a su plantilla, que es lo correcto. Ojo con el arranque en frío de los dos servicios.
-5. **Markdown:** el texto es markdown libre (negritas, listas y a veces títulos). El modo `corto` no existe todavía. Mientras tanto, tomen las primeras 1 a 3 frases.
-6. **Cuota de Groq:** hoy hay una sola llave de capa gratuita. Una llave aparte o el Dev Tier para el pitch está por decidir. De acuerdo con no probar el agente el día del demo fuera del ensayo.
-7. **`/api/explicar`:** hoy vive solo en el servidor del agente. En el back de Render responde 501. Cuando el agente esté desplegado, llamen a su URL.
+| Método | Ruta | Body |
+|---|---|---|
+| POST | `/agente/preguntar` | `{ "pregunta": "..." }` |
+| POST | `/api/explicar` | `{ "tipo": "alerta", "id": "A-05" }` o `{ "tipo": "puente", "empresa": "HERR" }` |
+| GET | `/agente/informe` | — (informe largo; gasta mucha cuota) |
+
+Ojo: las rutas del agente **no** llevan `/api` delante, salvo `/api/explicar`.
+
+**Regla para el front:** usen `texto` solo si `fuente === "ia"`. Si viene `"plantilla"` (Groq falló o se acabó la cuota), muestren su propia frase: la plantilla del agente hoy puede traer un volcado de datos largo que no sirve para el sidebar.
+
+**Prueba con las 3 preguntas del pitch** (21 nov, contra Render):
+
+| Pregunta | Resultado | Tiempo |
+|---|---|---|
+| ¿Qué empresas rinden menos que su costo de capital? | IA, cifras correctas (CONC 6.91 %, TRAC 8.11 %, LOGI 8.01 %, AGRO 8.20 % vs WACC 11 %) | 4.2 s |
+| ¿Por qué sube el EBIT de HERR? | IA, cifras correctas (2,260,000 → 2,422,365), pero todavía no separa efecto operativo y cambiario | 13.6 s |
+| ¿Qué tan graves eran los errores en Ppto 2026? | Plantilla: se agotó la cuota por minuto de Groq | 12.5 s |
+
+Con su límite de 8 s, hoy entraría la primera pregunta y las otras dos caerían a su plantilla. Para la "cascada" de HERR, la cifra buena es `GET /puente`; usen el agente solo para la frase.
+
+Respuestas a sus preguntas:
+
+1. **URL pública:** `https://hackaton-agente.onrender.com`. Plan free: se duerme sin tráfico igual que el back, y si los dos están dormidos la primera pregunta puede tardar más de un minuto. Antes del pitch, abran `/api/health` del back y hagan una pregunta de calentamiento al agente.
+2. **Backend real:** sí, desplegado con `FUENTE=http` contra `https://hackaton-back-7z3l.onrender.com/api`. El impacto por alerta ya lo usa (herramienta `impactoPorAlerta`).
+3. **Campo `grafica`:** todavía no existe. Lo pedimos a Elmer. Mientras tanto, sigan con su detección por palabras clave.
+4. **8 s:** de acuerdo, con la regla de arriba. Las preguntas puntuales tardan entre 4 y 14 s; si se agota la cuota, el agente espera hasta 30 s y reintenta.
+5. **Markdown:** libre (negritas, listas y a veces títulos). El modo `corto` no existe todavía; lo pedimos. Mientras tanto, tomen las primeras 1 a 3 frases.
+6. **Cuota de Groq:** hay una sola llave de capa gratuita y ya está al límite (3 preguntas en un minuto la agotaron). Vamos a conseguir una llave aparte o el Dev Tier para el pitch. Hasta entonces, eviten probar el agente fuera de lo necesario.
+7. **`/api/explicar`:** vive en el servicio del agente: `POST https://hackaton-agente.onrender.com/api/explicar`. En el back de Render sigue respondiendo 501; no lo usen ahí.
 8. **Frase del pitch:** "La IA no calcula. Cada cifra sale del motor; el modelo solo la explica, y si no tiene el dato, lo dice." No digan que los datos no salen de la infraestructura: salen a Groq (con datos ficticios no hay problema).
 
 ## 2. `POST /upload`
@@ -131,5 +154,6 @@ Está bien en el front. No hace falta endpoint por ahora.
 ## 10. Pendientes
 
 - `/sensibilidad` sigue en 501.
+- **Agente:** un push a la rama `agente` lo redespliega. Antes del pitch aplica lo mismo que con el back: nada de push después de la última prueba.
 - **Antes del pitch:** después de la última prueba no hacemos push a `main`. Para más seguridad, vamos a apagar **Auto-Deploy** en Render (Settings): así ningún push reinicia los datos por accidente.
 - Si alguien sube archivos antes del pitch, `POST /reset` lo deja como estaba.

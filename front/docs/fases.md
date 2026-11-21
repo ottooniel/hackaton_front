@@ -78,7 +78,7 @@ Cómo se conectan sin tocarse:
 
 **B**
 - [x] Conectar `GET /puente` y `GET /impacto-errores` a las gráficas del agente.
-- [ ] Probar `POST /agente` con Steven. Si no está, queda el respaldo por palabras clave. — El front ya llama a `{VITE_AGENTE_URL}/agente/preguntar`; falta que el back despliegue el agente y pase la URL.
+- [x] Probar `POST /agente` con Steven. Si no está, queda el respaldo por palabras clave. — Conectado a `https://hackaton-agente.onrender.com/agente/preguntar` (solo `fuente: "ia"`, 8 s). Falta probarlo en el navegador cuando haya cuota de Groq.
 - [x] Versión móvil: sidebar como hoja completa, botón flotante a `bottom: 80px`, gráficas que caben en 390px.
 
 **Congelamiento de funciones: 1:30 pm.** Después de esa hora no se agrega nada nuevo, solo se arregla.
