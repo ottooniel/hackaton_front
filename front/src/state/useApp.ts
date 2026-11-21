@@ -1,15 +1,16 @@
 import { createContext, useContext } from 'react';
-import type { ConsolidadoGrupo, ErrorValidacion, VersionId } from '../shared/types';
+import type { ConsolidadoGrupo, VersionId } from '../shared/types';
 import type { Estado, Paso } from './reducer';
 
 export interface App extends Estado {
-  errores: ErrorValidacion[];
   pendientesBloq: number;     // bloqueantes sin resolver
   publicable: boolean;        // compuerta: true cuando no quedan bloqueantes
   consolidado: ConsolidadoGrupo;
-  cargar: () => void;
+  cargarEjemplo: () => void;
+  subirArchivos: (archivos: File[]) => void;
   ir: (paso: Paso) => void;
   corregir: (ids: string[]) => void;
+  corregirTodo: () => void;
   aceptarDiferencia: (id: string) => void;
   cambiarVersion: (v: VersionId) => void;
   abrirAgente: () => void;

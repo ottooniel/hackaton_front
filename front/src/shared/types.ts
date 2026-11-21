@@ -7,6 +7,7 @@ export interface ErrorValidacion {
   empresa: string;          // 'AGRO' o 'LOGI y AGRO'
   severidad: Severidad;
   esIntercompania: boolean; // true → acción "Aceptar diferencia"
+  referencia?: string;      // 'IC-2025-05': lo que se manda en aceptarIC (solo intercompañía)
   titulo: string;           // una línea, lenguaje llano
   quePaso: string;
   comoSeCorrige: string;
