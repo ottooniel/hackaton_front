@@ -1,6 +1,8 @@
 # fases.md — Plan de implementación del front para 2 personas
 
-Persona **A** = Otto. Persona **B** = Carlos
+Persona **A** = Otto. Persona **B** = Carlos.
+
+> **Actualización 21 nov:** Carlos dejó el front; Otto lleva todo. Las tareas de B que siguen abiertas las hace Otto. Commits con prefijo convencional (`feat:`, `fix:`, `docs:`), no `a:` / `b:`.
 
 ## 1. Cómo nos repartimos sin pisarnos
 
@@ -44,8 +46,8 @@ Cómo se conectan sin tocarse:
 - [x] Kit `ui/`: Boton, Chip, Termino, Tarjeta.
 
 **B** (empieza de inmediato, sin esperar el arranque)
-- [ ] Leer `diseno.md` y `contenido.md`. Abrir el prototipo en el enlace.
-- [ ] Construir `GraficaBarrasRef`, `GraficaCascada` y `GraficaDivergente` como componentes puros con props (se pueden probar en una página suelta con los datos del mock).
+- [x] Leer `diseno.md` y `contenido.md`. Abrir el prototipo en el enlace.
+- [x] Construir `GraficaBarrasRef`, `GraficaCascada` y `GraficaDivergente` como componentes puros con props (se pueden probar en una página suelta con los datos del mock).
 
 **Salida de la fase:** el repo corre en las dos máquinas y las gráficas se ven con datos de ejemplo.
 
@@ -58,9 +60,9 @@ Cómo se conectan sin tocarse:
 - [x] Reglas de estado de `diseno.md` sección 7.
 
 **B**
-- [ ] Paso 3: `HeroAntesDespues`, `TarjetaRoic`, `TarjetaEva`, `TarjetaTotal`, tarjeta "¿Quieres entender algo más?".
-- [ ] `AgenteFab` y `AgenteSidebar`: chips, conversación, estado "pensando", formulario, enlace con el JSON, estado bloqueado.
-- [ ] `detectarGrafica()` y las 3 respuestas del agente con datos del mock.
+- [x] Paso 3: `HeroAntesDespues`, `TarjetaRoic`, `TarjetaEva`, `TarjetaTotal`, tarjeta "¿Quieres entender algo más?".
+- [x] `AgenteFab` y `AgenteSidebar`: chips, conversación, estado "pensando", formulario, enlace con el JSON, estado bloqueado.
+- [x] `detectarGrafica()` y las 3 respuestas del agente con datos del mock.
 
 **Primer punto de integración (12:35):** A y B suben a `main` lo que tengan, aunque esté a medias. Comprobar que el proyecto sigue compilando.
 
@@ -75,9 +77,9 @@ Cómo se conectan sin tocarse:
 - [x] Versión móvil del shell: barra inferior de pasos.
 
 **B**
-- [ ] Conectar `GET /puente` y `GET /impacto-errores` a las gráficas del agente.
-- [ ] Probar `POST /agente` con Steven. Si no está, queda el respaldo por palabras clave.
-- [ ] Versión móvil: sidebar como hoja completa, botón flotante a `bottom: 80px`, gráficas que caben en 390px.
+- [x] Conectar `GET /puente` y `GET /impacto-errores` a las gráficas del agente.
+- [ ] Probar `POST /agente` con Steven. Si no está, queda el respaldo por palabras clave. — El front ya llama a `{VITE_AGENTE_URL}/agente/preguntar`; falta que el back despliegue el agente y pase la URL.
+- [x] Versión móvil: sidebar como hoja completa, botón flotante a `bottom: 80px`, gráficas que caben en 390px.
 
 **Congelamiento de funciones: 1:30 pm.** Después de esa hora no se agrega nada nuevo, solo se arregla.
 

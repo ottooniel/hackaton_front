@@ -17,42 +17,34 @@ Detalle en `docs/diseno.md`, `docs/contenido.md` y `docs/fases.md` si existen en
 - Estilos: `src/styles/tokens.css` global + **CSS Modules** por componente (`X.module.css`). No escribir CSS global nuevo.
 - Fuentes: Montserrat (títulos) e Inter (texto), por Google Fonts.
 - Iconos: SVG en línea. Nunca emoji.
-- No instalar dependencias nuevas sin avisar al equipo.
+- No instalar dependencias nuevas.
 
 Comandos: `npm run dev` (desarrollo), `npm run build` (compilar y revisar tipos), `npm run lint`.
 
-## Quién edita qué (MUY IMPORTANTE)
+## Quién edita qué
 
-Somos dos personas en el front. **Antes de editar cualquier archivo, corre `git branch --show-current`.**
+Desde el 21 nov 2026 el front lo lleva **una sola persona (Otto)**. Se puede editar cualquier carpeta de `src/`.
 
-| Rama | Persona | Puede editar |
-|---|---|---|
-| `a/...` | A (Otto) | `src/shell/`, `src/carga/`, `src/revision/`, `src/ui/`, `src/state/`, `src/api/`, `src/styles/`, `src/shared/`, `App.tsx`, `main.tsx` |
-| `b/...` | B | `src/resultado/`, `src/agente/`, `src/graficas/` |
-
-Reglas:
-- Nunca edites una carpeta que no sea de la persona de tu rama. Si la tarea lo exige, detente y dilo.
-- `src/shared/types.ts`, `mock.ts`, `glosario.ts` y `styles/tokens.css` son contratos compartidos: solo los edita A, y cualquier cambio se avisa antes.
-- B recibe datos por props y por el hook `useApp()`. No importa nada de las carpetas de A salvo `ui/`, `shared/` y `tokens.css`.
-- `App.tsx` solo importa `Paso3` desde `./resultado` y `Agente` desde `./agente`. Mantener esos nombres.
-- Git: commits chicos con prefijo (`a: …`, `b: …`), `git pull --rebase origin main` antes de subir, nunca `push --force`, nunca subir directo a `main` salvo el arranque de A.
+Reglas que se mantienen:
+- `src/shared/types.ts` es el contrato con el backend: si cambia, revisar `api/adapters.ts` y quien use el tipo.
+- `App.tsx` monta `AppProvider` y `Shell`; el Shell importa `Paso3` desde `./resultado` y `Agente` desde `./agente`.
+- Git: trabajar en `a/pasos` y unir a `main` cuando algo funcione completo. Commits chicos con prefijo convencional en español (`feat: …`, `fix: …`, `docs: …`, `chore: …`). `git pull --rebase origin main` antes de subir, nunca `push --force`.
 
 ## Estructura
 
 ```
 src/
-  shell/        Shell, Stepper, header, pie            (A)
-  carga/        Dropzone, SlotsArchivos                (A)
-  revision/     FilaError, ProgresoRevision            (A)
-  resultado/    HeroAntesDespues, Tarjetas, Paso3      (B)
-  agente/       AgenteFab, AgenteSidebar, Agente       (B)
-  graficas/     GraficaBarrasRef, GraficaCascada,
-                GraficaDivergente                      (B)
-  ui/           Boton, Chip, Termino, Tarjeta          (A)
-  state/        useApp(), reducer, context             (A)
-  api/          client.ts, adapters.ts                 (A)
-  shared/       types.ts, mock.ts, glosario.ts         (A, contrato)
-  styles/       tokens.css, base.css                   (A)
+  shell/        Shell, Stepper, header, pie
+  carga/        Paso1, Dropzone, SlotsArchivos
+  revision/     Paso2, FilaError, ProgresoRevision, Bitacora
+  resultado/    Paso3, HeroAntesDespues, Tarjetas
+  agente/       Agente, AgenteFab, AgenteSidebar, detectarGrafica, datos
+  graficas/     GraficaBarrasRef, GraficaCascada, GraficaDivergente
+  ui/           Boton, Chip, Termino, Tarjeta, iconos
+  state/        useApp(), reducer, AppProvider
+  api/          client.ts, adapters.ts, respuestas/ (JSON reales para los chequeos)
+  shared/       types.ts, mock.ts, glosario.ts, formato.ts
+  styles/       tokens.css, base.css
 ```
 
 ## Reglas de diseño
@@ -71,14 +63,15 @@ src/
 - Montos del backend llegan como cadenas decimales y los porcentajes como fracciones (0.156 = 15.6%). Convertir solo en `api/adapters.ts`; los componentes reciben números.
 - Formato: miles con coma (`14,350,000`), negativo con `−`, millones con dos decimales (`14.35 M`), porcentajes con dos decimales (`9.63%`). La moneda del grupo es GTQ.
 - Textos en español llano, sin siglas sin explicar. Decir "simulación de escenarios", nunca "predicción". Los textos oficiales están en `docs/contenido.md`.
-- Los endpoints están en `docs/contenido.md` (sección 7). Si el backend falla, caer al mock sin mostrar un error técnico (flag `USAR_MOCK`).
-- El agente solo elige entre 3 gráficas (`barras_ref`, `cascada`, `divergente`) y redacta una frase. El respaldo por palabras clave (`detectarGrafica`) debe seguir funcionando sin backend.
+- Backend: `https://hackaton-back-7z3l.onrender.com/api`. Contrato en `docs/API del motor de consolidación — guía para el front.md` y `docs/respuesta-front.md`. Si el backend falla, caer al mock sin mostrar un error técnico (`VITE_USAR_MOCK=true` fuerza el mock).
+- `/upload` y `/reset` cambian los datos para todos. Render tarda ~30 s en despertar.
+- Agente IA: servicio aparte (`docs/agente-ia.md`), URL en `VITE_AGENTE_URL`. Solo se toma su `texto`; la gráfica la elige el front (`detectarGrafica`) y los números salen del motor. Sin URL o si tarda más de 8 s, queda el respaldo por palabras clave.
 
 ## Cómo trabajar
 
 - Cambios mínimos y enfocados. No refactorizar ni reformatear archivos que no son parte de la tarea.
-- Antes de dar algo por terminado: `npm run build` sin errores de tipos y revisar que se vea igual que el prototipo.
+- Antes de dar algo por terminado: `npm run build`, `npm run lint` y los chequeos (`node src/api/adapters.check.ts`, `node src/state/reducer.check.ts`, `node src/agente/frases.check.ts`), y revisar que se vea igual que el prototipo.
 - TypeScript estricto: sin `any`. Tipos de `shared/types.ts`.
 - No dejar `console.log` ni código comentado.
 - Hora límite de funciones: 1:30 pm. Después solo se corrigen errores y se pule.
-- Ante la duda sobre un dato, un texto o quién edita qué: preguntar en lugar de adivinar.
+- Ante la duda sobre un dato o un texto: preguntar en lugar de adivinar.
