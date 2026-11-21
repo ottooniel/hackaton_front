@@ -133,4 +133,15 @@ export const RESPUESTAS_AGENTE: RespuestaAgente[] = [
 
 export const ARCHIVOS_ESPERADOS = ['Supuestos', 'TRAC', 'AGRO', 'FERR', 'CONC', 'HERR', 'LOGI'] as const;
 
+/** Nombre exacto que exige el backend (viene en la hoja Empresas del 00_). Un archivo renombrado se ignora. */
+export const NOMBRE_ARCHIVO: Record<(typeof ARCHIVOS_ESPERADOS)[number], string> = {
+  Supuestos: '00_grupo_parametros_tasas_conciliaciones.xlsx',
+  TRAC: '01_tractores_del_istmo_cierre2025.xlsx',
+  AGRO: '02_agroinsumos_honduras_cierre2025.xlsx',
+  FERR: '03_ferreteria_central_cierre2025.xlsx',
+  CONC: '04_concretos_nacionales_cierre2025.xlsx',
+  HERR: '05_herramientas_pro_mexico_cierre2025.xlsx',
+  LOGI: '06_logistica_transporte_tico_cierre2025.xlsx',
+};
+
 export const AVISO_SIN_CIFRAS = 'Esta versión se calcula con el mismo motor. En este diseño inicial solo mostramos Real 2025.';

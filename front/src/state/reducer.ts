@@ -11,9 +11,8 @@ export interface Estado {
   resueltos: string[];       // ids de errores corregidos o aceptados
   fuente: Fuente;
   consolidadoApi: ConsolidadoGrupo | null; // último consolidado del backend; null → mock
-  ebitSinCorregir: number | null;          // de /impacto-errores (total.ebitConErrores)
   subiendo: boolean;
-  avisoRed: boolean;         // backend caído al subir → aviso + "Usar datos de ejemplo"
+  aviso: string | null;      // carga rechazada o backend caído → aviso + "Usar datos de ejemplo"
   version: VersionId;
   agenteAbierto: boolean;
   bitacora: string[];        // ponytail: en memoria, se pierde al recargar (así lo pide diseno.md §7)
@@ -21,8 +20,8 @@ export interface Estado {
 
 export type Accion =
   | { tipo: 'subiendo' }
-  | { tipo: 'cargar'; archivos: string[]; errores: ErrorValidacion[]; fuente: Fuente; ebitSinCorregir?: number | null }
-  | { tipo: 'avisoRed' }
+  | { tipo: 'cargar'; archivos: string[]; errores: ErrorValidacion[]; fuente: Fuente }
+  | { tipo: 'aviso'; mensaje: string }
   | { tipo: 'ir'; paso: Paso }
   | { tipo: 'resolver'; ids: string[]; nota: string }
   | { tipo: 'consolidado'; c: ConsolidadoGrupo }
@@ -38,9 +37,8 @@ export const inicial: Estado = {
   resueltos: [],
   fuente: 'mock',
   consolidadoApi: null,
-  ebitSinCorregir: null,
   subiendo: false,
-  avisoRed: false,
+  aviso: null,
   version: 'real_2025',
   agenteAbierto: false,
   bitacora: [],
@@ -58,15 +56,14 @@ export const esPublicable = (s: Estado) => s.cargado && pendientesBloq(s) === 0;
 export function reducer(s: Estado, a: Accion): Estado {
   switch (a.tipo) {
     case 'subiendo':
-      return { ...s, subiendo: true, avisoRed: false };
+      return { ...s, subiendo: true, aviso: null };
     case 'cargar':
       return {
         ...inicial, cargado: true, paso: 2, archivos: a.archivos, errores: a.errores, fuente: a.fuente,
-        ebitSinCorregir: a.ebitSinCorregir ?? null,
         bitacora: anotar(s, a.fuente === 'mock' ? 'Datos de ejemplo cargados' : `Archivos subidos: ${a.archivos.length}`),
       };
-    case 'avisoRed':
-      return { ...s, subiendo: false, avisoRed: true };
+    case 'aviso':
+      return { ...s, subiendo: false, aviso: a.mensaje };
     case 'ir': {
       const s2 = { ...s, agenteAbierto: false };
       if (a.paso === 2 && !s.cargado) return s2;

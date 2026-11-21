@@ -29,7 +29,7 @@ export function Dropzone({ onArchivos, ocupado = false }: Props) {
         className="vh"
         type="file"
         multiple
-        accept=".xlsx,.xls,.csv"
+        accept=".xlsx,.xls"
         disabled={ocupado}
         onChange={(e) => {
           const files = [...(e.target.files ?? [])];

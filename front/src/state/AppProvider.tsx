@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useReducer, type ReactNode } from 'react';
 import * as api from '../api/client';
-import { ARCHIVOS_ESPERADOS, CONSOLIDADO, CONSOLIDADO_BLOQUEADO, ERRORES } from '../shared/mock';
+import { ARCHIVOS_ESPERADOS, CONSOLIDADO, CONSOLIDADO_BLOQUEADO, ERRORES, NOMBRE_ARCHIVO } from '../shared/mock';
 import { esPublicable, inicial, pendientesBloq, reducer, type Estado } from './reducer';
 import { AppContext, type App } from './useApp';
 
-/** Casillas que reconocemos por el nombre del archivo ("05_herramientas…HERR.xlsx" → HERR; "00_…" → Supuestos). */
-const casillas = (archivos: File[]) =>
-  ARCHIVOS_ESPERADOS.filter((n) => archivos.some((f) => {
-    const nombre = f.name.toUpperCase();
-    return n === 'Supuestos' ? nombre.startsWith('00_') || nombre.includes('SUPUESTO') : nombre.includes(n);
-  }));
+const SIN_CONEXION = 'No pudimos conectar con el motor de cálculo. Puedes seguir con los datos de ejemplo.';
+
+/** Casillas por nombre exacto de archivo (sin backend). El backend ignora archivos renombrados. */
+const casillasPorNombre = (archivos: File[]) =>
+  ARCHIVOS_ESPERADOS.filter((n) => archivos.some((f) => f.name === NOMBRE_ARCHIVO[n]));
+
+/** Casillas según lo que reconoció el backend: si /upload respondió, el 00_ llegó. */
+const casillasPorResumen = (r: api.ResumenCarga) =>
+  ARCHIVOS_ESPERADOS.filter((n) => n === 'Supuestos' || !r.faltantes.includes(n));
 
 /** Lo que se manda a POST /escenario: bloqueantes corregidas (ids) y diferencias aceptadas (referencias IC). */
 function pedidoEscenario(s: Estado) {
@@ -31,22 +34,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (s.fuente !== 'api' || !s.cargado) return;
     const { corregidos, aceptados } = pedidoEscenario(s);
     let vigente = true;
-    api.escenario(s.version, corregidos, aceptados, s.ebitSinCorregir)
+    api.escenario(s.version, corregidos, aceptados)
       .then((c) => vigente && d({ tipo: 'consolidado', c }))
       .catch(() => undefined);
     return () => { vigente = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- solo estos campos cambian el pedido
-  }, [s.fuente, s.cargado, s.errores, s.resueltos, s.version, s.ebitSinCorregir]);
+  }, [s.fuente, s.cargado, s.errores, s.resueltos, s.version]);
 
   const app = useMemo<App>(() => {
     const publicable = esPublicable(s);
     const corregibles = s.errores.filter((e) => !e.esIntercompania).map((e) => e.id);
     const mock = () => d({ tipo: 'cargar', archivos: [...ARCHIVOS_ESPERADOS], errores: ERRORES, fuente: 'mock' });
-
-    /** Trae alertas y costo del error del dataset que tenga el servidor. */
-    const desdeApi = (archivos: string[]) =>
-      Promise.all([api.validacion(s.version), api.impactoErrores(s.version)])
-        .then(([errores, impacto]) => d({ tipo: 'cargar', archivos, errores, fuente: 'api', ebitSinCorregir: impacto.ebitSinCorregir }));
+    const alertas = (archivos: string[]) =>
+      api.validacion(s.version).then((errores) => d({ tipo: 'cargar', archivos, errores, fuente: 'api' }));
 
     // Mientras llega la respuesta del escenario se usa el mock con la misma compuerta, para no mostrar un grupo viejo.
     const deApi = s.consolidadoApi && s.consolidadoApi.publicable === publicable ? s.consolidadoApi : null;
@@ -58,19 +58,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       consolidado: deApi ?? (publicable ? CONSOLIDADO : CONSOLIDADO_BLOQUEADO),
       cargarEjemplo: () => {
         if (api.USAR_MOCK) return mock();
-        // ponytail: "ejemplo" = el dataset que tenga el servidor (vuelve al del reto cuando Render reinicia).
         d({ tipo: 'subiendo' });
-        desdeApi([...ARCHIVOS_ESPERADOS]).catch(mock);   // sin conexión: mock, sin mostrar error
+        // /reset vuelve al dataset del reto (para todos). Sin conexión: mock, sin mostrar error.
+        api.reset().then(() => alertas([...ARCHIVOS_ESPERADOS])).catch(mock);
       },
       subirArchivos: (archivos) => {
         if (api.USAR_MOCK) {
-          d({ tipo: 'cargar', archivos: casillas(archivos), errores: ERRORES, fuente: 'mock' });
+          d({ tipo: 'cargar', archivos: casillasPorNombre(archivos), errores: ERRORES, fuente: 'mock' });
           return;
         }
         d({ tipo: 'subiendo' });
         api.subir(archivos)
-          .then(() => desdeApi(casillas(archivos)))
-          .catch(() => d({ tipo: 'avisoRed' }));
+          .then((r) => alertas(casillasPorResumen(r)))
+          // 400 (SIN_PARAMETROS, INGESTA): el mensaje del backend ya está en lenguaje claro.
+          .catch((e: unknown) => d({ tipo: 'aviso', mensaje: e instanceof api.ErrorApi && e.status === 400 ? e.message : SIN_CONEXION }));
       },
       ir: (paso) => d({ tipo: 'ir', paso }),
       corregir: (ids) => d({ tipo: 'resolver', ids, nota: 'Corregido' }),
