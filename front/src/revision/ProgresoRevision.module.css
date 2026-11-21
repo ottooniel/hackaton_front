@@ -1,0 +1,6 @@
+.progreso { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.barra { flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px; }
+.pista { height: 12px; border-radius: var(--radio-pill); background: var(--neutro-bg); overflow: hidden; }
+.relleno { height: 100%; background: var(--azul); border-radius: var(--radio-pill); transition: width .3s; }
+.texto { font-size: 14px; color: var(--texto-2); }
+.estado { font-size: 13px; white-space: normal; }
