@@ -99,7 +99,7 @@ Presupuesto 2026 y Reforecast 2026 no tienen cifras de grupo en el mock. Mostrar
 
 **Pasos**: 1 Carga ("Sube tus archivos" / "7 archivos listos") · 2 Revisa ("Errores y diferencias" / "N por resolver" / "Todo resuelto") · 3 Entiende ("Resultado y preguntas").
 
-**Paso 1**: "Carga tus archivos" · "Un archivo de supuestos y uno por empresa. Excel o CSV." · "Arrastra aquí tus archivos" · "o haz clic para elegirlos desde tu computadora" · "Esperamos:" · botón "Probar con datos de ejemplo" · nota "Sin archivos a la mano. Cargamos las seis empresas del reto."
+**Paso 1**: "Carga tus archivos" · "Un archivo de supuestos y uno por empresa. Solo archivos Excel (.xlsx)." · "Arrastra aquí tus archivos" · "o haz clic para elegirlos desde tu computadora" · "Esperamos:" · botón "Probar con datos de ejemplo" · nota "Sin archivos a la mano. Cargamos las seis empresas del reto."
 
 **Paso 2**: "Revisa lo que encontramos" · "Hasta resolver lo marcado como bloqueante, no publicamos el total del grupo. Toca una fila para ver el detalle." · botón "Corregir todo lo corregible" · "N de 7 resueltos" · "Total del grupo bloqueado: faltan N" · "Listo para publicar" · botones "Corregir", "Aceptar diferencia", "Ver el resultado" · pie "Cada corrección queda anotada en la bitácora."
 
