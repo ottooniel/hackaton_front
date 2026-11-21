@@ -86,10 +86,10 @@ Cómo se conectan sin tocarse:
 ### Fase 3 — Pulido y pitch (1:30 al cierre)
 
 **Los dos**
-- [ ] Recorrer el flujo completo 3 veces y anotar fallos en una lista compartida.
-- [ ] Revisar textos contra `contenido.md` (lenguaje llano, sin errores de ortografía).
-- [ ] Revisar tooltips en todas las cifras importantes (EBIT, ROIC, WACC, EVA, intercompañía, efectos).
-- [ ] Probar en móvil (ancho 390) y en la pantalla del pitch.
+- [x] Recorrer el flujo completo 3 veces y anotar fallos en una lista compartida. — QA del 21 nov; fallos del front corregidos.
+- [ ] Revisar textos contra `contenido.md` (lenguaje llano, sin errores de ortografía). — Falta "timing" (texto del back, regla intercompañía).
+- [x] Revisar tooltips en todas las cifras importantes (EBIT, ROIC, WACC, EVA, intercompañía, efectos). — Abren con foco, área de 44 px y no se salen del panel.
+- [ ] Probar en móvil (ancho 390) y en la pantalla del pitch. — 390 revisado en QA (header reducido); falta la pantalla del pitch.
 - [ ] Grabar un video corto del flujo como respaldo por si falla la conexión.
 - [ ] Preparar los datos de ejemplo para la demostración: el flujo debe funcionar sin internet.
 
