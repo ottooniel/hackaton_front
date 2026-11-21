@@ -16,15 +16,17 @@ const ic = errores.filter((e) => e.esIntercompania);
 assert.deepEqual(ic.map((e) => e.referencia).sort(), ['IC-2025-03', 'IC-2025-05']);
 assert.equal(ic[0].empresa, 'LOGI y AGRO');
 
-const bloq = aConsolidado(con as never, null);
+const bloq = aConsolidado(con as never);
 assert.equal(bloq.publicable, false);
 assert.equal(bloq.ebitGrupo, null);
 assert.equal(bloq.empresas.length, 6);
+assert.equal(bloq.wacc, 0.11);
+assert.equal(bloq.ebitSinCorregir, -386_104.7);
+assert.equal(bloq.empresas.find((e) => e.codigo === 'HERR')?.monedaLocal, 'MXN');
 
-const imp = aImpacto(imp26 as never);
-assert.deepEqual(imp.barras.map((b) => b.valor), [6.72, -16.49, -9.77]);
+assert.deepEqual(aImpacto(imp26 as never).barras.map((b) => b.valor), [6.72, -16.49, -9.77]);
 
-const ok = aConsolidado(esc as never, -386_104.7);
+const ok = aConsolidado(esc as never);
 assert.equal(ok.publicable, true);
 assert.equal(ok.ebitGrupo, 14_350_000);
 assert.equal(ok.roicGrupo, 0.0963);

@@ -5,19 +5,19 @@ import { SlotsArchivos } from './SlotsArchivos';
 import css from './Paso1.module.css';
 
 export function Paso1() {
-  const { archivos, subiendo, avisoRed, subirArchivos, cargarEjemplo } = useApp();
+  const { archivos, subiendo, aviso, subirArchivos, cargarEjemplo } = useApp();
   return (
     <Tarjeta className={css.paso}>
       <div className={css.cabeza}>
         <h2 className={css.titulo}>Carga tus archivos</h2>
-        <p className={css.desc}>Un archivo de supuestos y uno por empresa. Excel o CSV.</p>
+        <p className={css.desc}>Un archivo de supuestos y uno por empresa. Solo archivos Excel (.xlsx).</p>
       </div>
 
       <Dropzone onArchivos={subirArchivos} ocupado={subiendo} />
 
-      {avisoRed && (
+      {aviso && (
         <div className={css.aviso} role="alert">
-          <span>No pudimos conectar con el motor de cálculo. Puedes seguir con los datos de ejemplo.</span>
+          <span>{aviso}</span>
           <Boton tam="s" variante="contorno" onClick={cargarEjemplo}>Usar datos de ejemplo</Boton>
         </div>
       )}

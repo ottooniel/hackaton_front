@@ -26,9 +26,11 @@ export interface AlertaCruda {
 }
 export interface ValidacionCruda { version: VersionId; publicable: boolean; alertas: AlertaCruda[] }
 
-// Títulos de una línea en lenguaje llano. Moneda (y reglas nuevas) usan el mensaje del backend,
-// que ya es corto: 'AGRO registró "Gasto financiero" en NIO, una moneda sin tasa.'
+// Títulos de una línea por regla (las 7 que tiene el validador). Moneda usa el mensaje del backend,
+// que ya es corto y dice cuál: 'AGRO registró "Gasto financiero" en NIO, una moneda sin tasa.'
 const TITULOS: Record<string, string> = {
+  archivo_faltante: 'Falta el archivo de una empresa',
+  encabezado: 'Una hoja no tiene los encabezados esperados',
   total: 'El total de una hoja no coincide con la suma',
   signo: 'Un monto tiene el signo al revés',
   duplicado: 'La misma fila aparece dos veces',
@@ -63,20 +65,22 @@ export interface IndicadoresCrudos {
 export interface ConsolidadoCrudo {
   version: VersionId;
   publicable: boolean;
+  wacc?: string;
+  ebitSinCorregir?: string;            // EBIT del grupo del dataset sin el escenario
   grupo: IndicadoresCrudos | null;
-  empresas: Partial<Record<EmpresaCodigo, { conAlertas: boolean; indicadores: IndicadoresCrudos }>>;
+  empresas: Partial<Record<EmpresaCodigo, { moneda?: string; conAlertas: boolean; indicadores: IndicadoresCrudos }>>;
   eliminacionesIC: { ventasEliminadas: string; costosEliminados: string; diferenciaNoConciliada: string };
 }
 
-// ponytail: moneda y WACC no vienen en /consolidado; son fijos del reto (iguales a GET /empresas y /supuestos).
+// Respaldo si el backend no manda moneda o wacc (versiones anteriores de la API).
 const MONEDA: Record<EmpresaCodigo, string> = { TRAC: 'USD', AGRO: 'HNL', FERR: 'GTQ', CONC: 'GTQ', HERR: 'MXN', LOGI: 'CRC' };
 const WACC = 0.11;
 
-export function aConsolidado(c: ConsolidadoCrudo, ebitSinCorregir: number | null): ConsolidadoGrupo {
+export function aConsolidado(c: ConsolidadoCrudo): ConsolidadoGrupo {
   const empresas: FilaEmpresa[] = Object.entries(c.empresas)
     .flatMap(([codigo, e]) => (e ? [{
       codigo: codigo as EmpresaCodigo,
-      monedaLocal: MONEDA[codigo as EmpresaCodigo] ?? '',
+      monedaLocal: e.moneda ?? MONEDA[codigo as EmpresaCodigo] ?? '',
       ebit: num(e.indicadores.ebit.valor),
       roic: num(e.indicadores.roic),
       eva: num(e.indicadores.eva.valor),
@@ -88,10 +92,10 @@ export function aConsolidado(c: ConsolidadoCrudo, ebitSinCorregir: number | null
     version: c.version,
     publicable: g !== null,
     ebitGrupo: g ? num(g.ebit.valor) : null,
-    ebitSinCorregir,
+    ebitSinCorregir: c.ebitSinCorregir === undefined ? null : num(c.ebitSinCorregir),
     roicGrupo: g ? num(g.roic) : null,
     evaGrupo: g ? num(g.eva.valor) : null,
-    wacc: WACC,
+    wacc: c.wacc === undefined ? WACC : num(c.wacc),
     sumaEmpresas: g ? empresas.reduce((s, e) => s + e.ebit, 0) : null,
     diferenciaIC: g ? num(c.eliminacionesIC.diferenciaNoConciliada) : null,
     empresas,
@@ -112,7 +116,10 @@ export interface ImpactoCrudo {
 
 const ETQ_ERROR: Record<string, string> = { signo: 'Error de signo', moneda: 'Error de moneda', duplicado: 'Fila duplicada' };
 
-/** Barras en millones GTQ (lo que suma o resta cada error) + el neto que se ve en el total. */
+/**
+ * Barras en millones GTQ + el neto que se ve en el total.
+ * `diferencia` = EBIT con error − EBIT sin error: positivo = el error inflaba el EBIT.
+ */
 export function aImpacto(i: ImpactoCrudo): { barras: BarraDivergente[]; ebitSinCorregir: number } {
   const m = (v: string) => Math.round(num(v) / 1e4) / 100;
   const barras = i.items.flatMap((it) =>

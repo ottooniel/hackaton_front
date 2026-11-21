@@ -1,5 +1,5 @@
 // Cliente del backend v3. Cualquier fallo o demora lanza error; quien llama cae al mock.
-import type { BarraDivergente, ConsolidadoGrupo, ErrorValidacion, Puente, VersionId } from '../shared/types';
+import type { BarraDivergente, ConsolidadoGrupo, EmpresaCodigo, ErrorValidacion, Puente, VersionId } from '../shared/types';
 import {
   aConsolidado, aErrores, aImpacto, aPuente,
   type ConsolidadoCrudo, type ImpactoCrudo, type PuenteCrudo, type ValidacionCruda,
@@ -10,7 +10,7 @@ export const USAR_MOCK = import.meta.env.VITE_USAR_MOCK === 'true';
 const BASE: string = import.meta.env.VITE_API_URL ?? 'https://hackaton-back-7z3l.onrender.com/api';
 const ESPERA_MS = 40_000;   // Render free tarda ~30 s en despertar
 
-/** Error con la forma del backend: { error: { codigo, mensaje, … } } */
+/** Error con la forma del backend: { error: { codigo, mensaje, … } }. `mensaje` se puede mostrar tal cual. */
 export class ErrorApi extends Error {
   status: number;
   codigo: string;
@@ -33,18 +33,28 @@ async function pedir<T>(ruta: string, init?: RequestInit): Promise<T> {
   return r.json() as Promise<T>;
 }
 
-const post = (body: unknown): RequestInit => ({
-  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+const post = (body?: unknown): RequestInit => ({
+  method: 'POST',
+  ...(body === undefined ? {} : { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
 });
 
 /** Despierta el servidor antes de que el usuario lo necesite. */
 export const despertar = () => pedir('/health').catch(() => undefined);
 
+/** Vuelve al dataset del reto (para todos). Después hay que pedir /validacion. */
+export const reset = () => pedir<{ ok: boolean; totalRegistros: number }>('/reset', post());
+
 export interface ResumenCarga {
-  archivos: unknown; faltantes: unknown; totalRegistros: number; alertas: { bloqueantes: number; advertencias: number };
+  archivos: string[];           // nombres tal como se subieron
+  faltantes: EmpresaCodigo[];   // empresas sin archivo reconocido (cada una deja una alerta archivo_faltante)
+  totalRegistros: number;
+  alertas: { bloqueantes: number; advertencias: number };
 }
 
-/** Reemplaza el dataset en el servidor (para todos). El archivo `00_` de supuestos es obligatorio. */
+/**
+ * Reemplaza TODO el dataset del servidor (para todos): hay que subir el 00_ y los 6.
+ * Errores 400: SIN_PARAMETROS (falta 00_), INGESTA (archivo ilegible). Límite: 10 archivos de 10 MB, solo Excel.
+ */
 export function subir(archivos: File[]): Promise<ResumenCarga> {
   const fd = new FormData();
   archivos.forEach((f) => fd.append('archivos', f));
@@ -54,20 +64,21 @@ export function subir(archivos: File[]): Promise<ResumenCarga> {
 export const validacion = async (version: VersionId): Promise<ErrorValidacion[]> =>
   aErrores(await pedir<ValidacionCruda>(`/validacion?version=${version}`));
 
+/** Costo de cada error en el EBIT del grupo, en millones GTQ, para GraficaDivergente. */
 export const impactoErrores = async (version: VersionId): Promise<{ barras: BarraDivergente[]; ebitSinCorregir: number }> =>
   aImpacto(await pedir<ImpactoCrudo>(`/impacto-errores?version=${version}`));
 
-export const consolidado = async (version: VersionId, ebitSinCorregir: number | null = null): Promise<ConsolidadoGrupo> =>
-  aConsolidado(await pedir<ConsolidadoCrudo>(`/consolidado?version=${version}`), ebitSinCorregir);
+export const consolidado = async (version: VersionId): Promise<ConsolidadoGrupo> =>
+  aConsolidado(await pedir<ConsolidadoCrudo>(`/consolidado?version=${version}`));
 
 /**
- * Recalcula sin guardar. `aplicarCorrecciones`: ids de alerta (no intercompañía) o "todas".
- * `aceptarIC`: referencias IC ("IC-2025-05"), no ids de alerta.
+ * Recalcula sin guardar. `aplicarCorrecciones`: ids de alertas bloqueantes no intercompañía, o "todas"
+ * (solo las de esa versión). `aceptarIC`: referencias IC ("IC-2025-05"), no ids de alerta.
  */
 export const escenario = async (
-  version: VersionId, aplicarCorrecciones: string[] | 'todas', aceptarIC: string[], ebitSinCorregir: number | null = null,
+  version: VersionId, aplicarCorrecciones: string[] | 'todas', aceptarIC: string[],
 ): Promise<ConsolidadoGrupo> =>
-  aConsolidado(await pedir<ConsolidadoCrudo>('/escenario', post({ version, aplicarCorrecciones, aceptarIC })), ebitSinCorregir);
+  aConsolidado(await pedir<ConsolidadoCrudo>('/escenario', post({ version, aplicarCorrecciones, aceptarIC })));
 
 /**
  * Puente base + operativo + cambiario = nuevo. Si la empresa tiene moneda mixta (hoy CONC),
