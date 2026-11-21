@@ -11,10 +11,6 @@ interface Props {
 
 const ALTO = 168;
 
-function cifra(v: number) {
-  return Math.abs(v) >= 1_000_000 ? millones(v) : miles(v);
-}
-
 function cursorAntes(pasos: PasoPuente[], indice: number, min: number) {
   return pasos.slice(0, indice).reduce(
     (cursor, paso) => (paso.tipo === 'total' ? paso.valor : cursor + paso.valor),
@@ -35,14 +31,14 @@ export function GraficaCascada({ pasos, min, span }: Props) {
   });
 
   return (
-    <figure className={styles.figura}>
+    <figure className={styles.figura} role="img" aria-label={`Puente del EBIT en GTQ: ${pasos.map((p) => `${p.etiqueta} ${miles(p.valor)}`).join(', ')}`}>
       <div className={styles.lienzo}>
         {barras.map((b) => {
           const base = Math.min(b.inicio, b.fin);
           const techo = Math.max(b.inicio, b.fin);
           return (
             <div className={styles.col} key={b.etiqueta}>
-              <span className={styles.cifra}>{cifra(b.valor)}</span>
+              <span className={styles.cifra}>{miles(b.valor)}</span>
               <div className={styles.eje} style={{ height: ALTO }}>
                 <div
                   className={styles.barra}
@@ -59,8 +55,8 @@ export function GraficaCascada({ pasos, min, span }: Props) {
         })}
       </div>
       <p className={styles.nota}>
-        GTQ. El eje empieza en {millones(min)} para que se vea el cambio.{' '}
-        <Termino clave="efecto_operativo">Efecto operativo</Termino> y{' '}
+        GTQ. El eje empieza en {millones(min)} para que se vea el cambio. Qué es el{' '}
+        <Termino clave="efecto_operativo">efecto operativo</Termino> y el{' '}
         <Termino clave="efecto_cambiario" alinear="der">efecto cambiario</Termino>.
       </p>
     </figure>

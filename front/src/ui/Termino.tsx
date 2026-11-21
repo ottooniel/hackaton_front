@@ -14,7 +14,7 @@ export function Termino({ clave, children, alinear = 'izq' }: Props) {
   return (
     <span className={css.termino}>
       <button type="button" className={css.boton} aria-describedby={id}>{children}</button>
-      <span id={id} role="tooltip" className={`${css.tip} ${alinear === 'der' ? css.der : ''}`}>{glosario[clave]}</span>
+      <span id={id} role="tooltip" aria-hidden="true" className={`${css.tip} ${alinear === 'der' ? css.der : ''}`}>{glosario[clave]}</span>
     </span>
   );
 }

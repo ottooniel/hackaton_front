@@ -53,6 +53,8 @@ export async function pedirRespuesta(pregunta: string): Promise<RespuestaAgente>
         const data = (await r.json()) as RespuestaServicio;
         const usadas = Array.isArray(data.herramientasUsadas) ? (data.herramientasUsadas as Herramienta[]) : [];
         const texto = data.fuente === 'ia' && typeof data.texto === 'string' ? frasesCortas(data.texto) : '';
+        // La IA no pone cifras ni opina de la compuerta: si lo hace, queda la frase del front (cifras del motor).
+        if (/\d|publicable|wacc/i.test(texto)) throw new Error('texto con cifras');
         if (texto && (usadas.length || porPalabras.grafica)) {
           respuesta = armar(pregunta, planPorHerramientas(usadas, pregunta) ?? porPalabras, usadas, texto);
         }

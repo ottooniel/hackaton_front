@@ -45,8 +45,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const publicable = esPublicable(s);
     const corregibles = s.errores.filter((e) => !e.esIntercompania).map((e) => e.id);
     const mock = () => d({ tipo: 'cargar', archivos: [...ARCHIVOS_ESPERADOS], errores: ERRORES, fuente: 'mock' });
-    const alertas = (archivos: string[]) =>
-      api.validacion(s.version).then((errores) => d({ tipo: 'cargar', archivos, errores, fuente: 'api' }));
+    const alertas = (archivos: string[], ejemplo = false) =>
+      api.validacion(s.version).then((errores) => d({ tipo: 'cargar', archivos, errores, fuente: 'api', ejemplo }));
 
     // Mientras llega la respuesta del escenario se usa el mock con la misma compuerta, para no mostrar un grupo viejo.
     const deApi = s.consolidadoApi && s.consolidadoApi.publicable === publicable ? s.consolidadoApi : null;
@@ -60,7 +60,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (api.USAR_MOCK) return mock();
         d({ tipo: 'subiendo' });
         // /reset vuelve al dataset del reto (para todos). Sin conexión: mock, sin mostrar error.
-        api.reset().then(() => alertas([...ARCHIVOS_ESPERADOS])).catch(mock);
+        api.reset().then(() => alertas([...ARCHIVOS_ESPERADOS], true)).catch(mock);
       },
       subirArchivos: (archivos) => {
         if (api.USAR_MOCK) {

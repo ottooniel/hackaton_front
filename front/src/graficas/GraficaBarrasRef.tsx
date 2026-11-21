@@ -12,7 +12,7 @@ export function GraficaBarrasRef({ items, referencia, max }: Props) {
   const marca = Math.min(100, (referencia / max) * 100);
 
   return (
-    <figure className={styles.figura}>
+    <figure className={styles.figura} role="img" aria-label={`${items.map((i) => `${i.etiqueta} ${pct(i.valor)}`).join(', ')}, frente a un costo del capital de ${pct(referencia)}`}>
       <div className={styles.leyenda}>
         <span className={styles.muestra} />
         Costo del capital {pct(referencia)}

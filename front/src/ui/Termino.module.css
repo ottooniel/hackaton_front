@@ -9,6 +9,8 @@
   padding: 0;
   margin: 0;
   cursor: help;
+  position: relative;
+  text-align: inherit;
   text-transform: inherit;
   letter-spacing: inherit;
 }
@@ -30,6 +32,7 @@
   box-shadow: 0 8px 24px rgba(19,21,23,.3);
   text-align: left;
 }
+.boton::after { content: ''; position: absolute; inset: -12px -4px; }   /* área táctil de 44 px sin mover el texto */
 .der { left: auto; right: 0; }
 
 .termino:hover .tip,

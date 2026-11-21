@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type FormEvent, type KeyboardEvent, type SetStateAction } from 'react';
 import { RESPUESTAS_AGENTE } from '../shared/mock';
 import type { RespuestaAgente } from '../shared/types';
 import { useApp } from '../state/useApp';
@@ -9,20 +9,25 @@ import { datosDe, type DatosGrafica } from './datos';
 import { pedirRespuesta } from './detectarGrafica';
 import { GraficaRespuesta } from './GraficaRespuesta';
 
-type Turno =
+export type Turno =
   | { id: number; rol: 'persona'; texto: string }
   | { id: number; rol: 'agente'; pensando: true }
   | { id: number; rol: 'agente'; pensando: false; respuesta: RespuestaAgente; datos: DatosGrafica | null };
 
 let siguiente = 1;
 
-export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
+interface Props {
+  onCerrar: () => void;
+  turnos: Turno[];   // vive en el padre: cerrar el panel no borra el historial
+  setTurnos: Dispatch<SetStateAction<Turno[]>>;
+}
+
+export function AgenteSidebar({ onCerrar, turnos, setTurnos }: Props) {
   const { publicable, consolidado, ir } = useApp();
   const cerrarRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const [texto, setTexto] = useState('');
-  const [turnos, setTurnos] = useState<Turno[]>([]);
-  const [ocupado, setOcupado] = useState(false);
+  const ocupado = turnos.some((t) => t.rol === 'agente' && t.pensando);
 
   useEffect(() => { cerrarRef.current?.focus(); }, []);
 
@@ -32,7 +37,6 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
     const idPersona = siguiente++;
     const idAgente = siguiente++;
     setTexto('');
-    setOcupado(true);
     setTurnos((prev) => [
       ...prev,
       { id: idPersona, rol: 'persona', texto: limpio },
@@ -46,7 +50,6 @@ export function AgenteSidebar({ onCerrar }: { onCerrar: () => void }) {
         ? { id: idAgente, rol: 'agente', pensando: false, respuesta: visible, datos }
         : t
     )));
-    setOcupado(false);
   }
 
   /** Escape cierra; Tab y Shift+Tab dan la vuelta dentro del panel (es un diálogo modal). */

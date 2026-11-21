@@ -1,4 +1,5 @@
 import type { BarraDivergente } from '../shared/types';
+import { millones } from '../shared/formato';
 import styles from './GraficaDivergente.module.css';
 
 interface Props {
@@ -13,7 +14,7 @@ function millonesYa(v: number) {
 
 export function GraficaDivergente({ items, max }: Props) {
   return (
-    <figure className={styles.figura}>
+    <figure className={styles.figura} role="img" aria-label={`Efecto en el EBIT, GTQ: ${items.map((i) => `${i.etiqueta} ${millones(i.valor * 1e6)}`).join(', ')}`}>
       <div className={styles.lista}>
         {items.map((item) => {
           const ancho = Math.min(100, (Math.abs(item.valor) / max) * 100);

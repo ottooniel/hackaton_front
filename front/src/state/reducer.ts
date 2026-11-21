@@ -20,7 +20,7 @@ export interface Estado {
 
 export type Accion =
   | { tipo: 'subiendo' }
-  | { tipo: 'cargar'; archivos: string[]; errores: ErrorValidacion[]; fuente: Fuente }
+  | { tipo: 'cargar'; archivos: string[]; errores: ErrorValidacion[]; fuente: Fuente; ejemplo?: boolean }
   | { tipo: 'aviso'; mensaje: string }
   | { tipo: 'ir'; paso: Paso }
   | { tipo: 'resolver'; ids: string[]; nota: string }
@@ -60,7 +60,7 @@ export function reducer(s: Estado, a: Accion): Estado {
     case 'cargar':
       return {
         ...inicial, cargado: true, paso: 2, archivos: a.archivos, errores: a.errores, fuente: a.fuente,
-        bitacora: anotar(s, a.fuente === 'mock' ? 'Datos de ejemplo cargados' : `Archivos subidos: ${a.archivos.length}`),
+        bitacora: anotar(s, a.fuente === 'mock' || a.ejemplo ? 'Datos de ejemplo cargados' : `Archivos subidos: ${a.archivos.length}`),
       };
     case 'aviso':
       return { ...s, subiendo: false, aviso: a.mensaje };

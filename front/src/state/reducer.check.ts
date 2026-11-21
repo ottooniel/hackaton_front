@@ -24,4 +24,8 @@ assert.equal(s.paso, 3);
 assert.equal(s.bitacora.length, 3);
 
 assert.deepEqual(reducer(s, { tipo: 'reiniciar' }), inicial);
+// Datos de ejemplo por /reset (fuente api) se anotan como ejemplo, no como archivos subidos.
+const ej = reducer(inicial, { tipo: 'cargar', archivos: ['Supuestos'], errores: ERRORES, fuente: 'api', ejemplo: true });
+assert.ok(ej.bitacora[0].endsWith('Datos de ejemplo cargados'));
+
 console.info('reducer ok');
