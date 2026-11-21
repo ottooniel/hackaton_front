@@ -1,0 +1,61 @@
+.app { padding-bottom: 48px; }
+
+.header { background: var(--azul); color: #fff; position: relative; overflow: hidden; }
+.formas { position: absolute; right: -60px; top: -40px; opacity: .9; }
+.encabezado {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 36px 28px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+}
+.kicker {
+  font: 700 13px/1.2 var(--fuente-titulo);
+  color: var(--amarillo);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.titulo { font-size: 44px; line-height: 1.08; font-weight: 800; max-width: 680px; }
+.frase { font-size: 19px; max-width: 560px; color: var(--azul-tx-claro); }
+
+.main {
+  max-width: 1160px;
+  margin: -64px auto 0;
+  padding: 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+}
+
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--texto-2);
+  font-size: 13px;
+}
+.reiniciar {
+  font: 600 13px/1.2 var(--fuente-texto);
+  background: none;
+  border: 0;
+  color: var(--azul);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .app { padding-bottom: 96px; }   /* deja espacio a la barra inferior de pasos */
+  .formas { display: none; }
+  .encabezado { padding: 20px 16px 24px; gap: 10px; }
+  .titulo { font-size: 28px; }
+  .frase { font-size: 15px; }
+  .main { margin-top: 20px; padding: 0 16px; gap: 16px; }
+}
