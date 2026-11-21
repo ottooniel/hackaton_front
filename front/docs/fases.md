@@ -35,13 +35,13 @@ Cómo se conectan sin tocarse:
 ### Fase 0 — Arranque (11:56 a 12:20)
 
 **A**
-- [ ] Crear el proyecto Vite + React + TypeScript y subirlo a `main`.
-- [ ] Copiar `tokens.css` y `base.css` (de `diseno.md`) y cargar las fuentes.
-- [ ] Crear `shared/types.ts`, `shared/mock.ts` y `shared/glosario.ts` con el contenido de `contenido.md`.
-- [ ] Crear los esqueletos vacíos de `resultado/` y `agente/` (para que B no espere).
-- [ ] Crear `state/` con `useApp()` leyendo el mock.
-- [ ] Avisar a B: "main listo, haz pull".
-- [ ] Kit `ui/`: Boton, Chip, Termino, Tarjeta.
+- [x] Crear el proyecto Vite + React + TypeScript y subirlo a `main`.
+- [x] Copiar `tokens.css` y `base.css` (de `diseno.md`) y cargar las fuentes.
+- [x] Crear `shared/types.ts`, `shared/mock.ts` y `shared/glosario.ts` con el contenido de `contenido.md`.
+- [x] Crear los esqueletos vacíos de `resultado/` y `agente/` (para que B no espere).
+- [x] Crear `state/` con `useApp()` leyendo el mock.
+- [x] Avisar a B: "main listo, haz pull".
+- [x] Kit `ui/`: Boton, Chip, Termino, Tarjeta.
 
 **B** (empieza de inmediato, sin esperar el arranque)
 - [ ] Leer `diseno.md` y `contenido.md`. Abrir el prototipo en el enlace.
@@ -52,10 +52,10 @@ Cómo se conectan sin tocarse:
 ### Fase 1 — Pantallas (12:20 a 12:55)
 
 **A**
-- [ ] `Shell`: header con formas, stepper (3 pasos) y pie.
-- [ ] Paso 1: `Dropzone` y `SlotsArchivos`, botón "Probar con datos de ejemplo".
-- [ ] Paso 2: `FilaError` expandible, `ProgresoRevision`, "Corregir todo lo corregible", "Aceptar diferencia", compuerta que habilita el paso 3.
-- [ ] Reglas de estado de `diseno.md` sección 7.
+- [x] `Shell`: header con formas, stepper (3 pasos) y pie.
+- [x] Paso 1: `Dropzone` y `SlotsArchivos`, botón "Probar con datos de ejemplo".
+- [x] Paso 2: `FilaError` expandible, `ProgresoRevision`, "Corregir todo lo corregible", "Aceptar diferencia", compuerta que habilita el paso 3.
+- [x] Reglas de estado de `diseno.md` sección 7.
 
 **B**
 - [ ] Paso 3: `HeroAntesDespues`, `TarjetaRoic`, `TarjetaEva`, `TarjetaTotal`, tarjeta "¿Quieres entender algo más?".
@@ -69,10 +69,10 @@ Cómo se conectan sin tocarse:
 ### Fase 2 — Backend y móvil (12:55 a 1:30)
 
 **A**
-- [ ] `api/client.ts` y `api/adapters.ts` (cadenas decimales → números, fracciones → porcentajes).
-- [ ] Conectar `POST /upload`, `GET /validacion`, `POST /escenario`, `GET /consolidado`. Si un endpoint falla, el mock sigue funcionando (flag `USAR_MOCK`).
-- [ ] Bitácora en memoria (lista de acciones).
-- [ ] Versión móvil del shell: barra inferior de pasos.
+- [x] `api/client.ts` y `api/adapters.ts` (cadenas decimales → números, fracciones → porcentajes).
+- [x] Conectar `POST /upload`, `GET /validacion`, `POST /escenario`, `GET /consolidado`. Si un endpoint falla, el mock sigue funcionando (flag `USAR_MOCK`). Adapters probados con respuestas reales (`node src/api/adapters.check.ts`).
+- [x] Bitácora en memoria (lista de acciones).
+- [x] Versión móvil del shell: barra inferior de pasos.
 
 **B**
 - [ ] Conectar `GET /puente` y `GET /impacto-errores` a las gráficas del agente.
