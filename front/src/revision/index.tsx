@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Boton, Tarjeta } from '../ui';
 import { IcoFlecha } from '../ui/iconos';
 import { useApp } from '../state/useApp';
+import { Bitacora } from './Bitacora';
 import { FilaError } from './FilaError';
 import { ProgresoRevision } from './ProgresoRevision';
 import css from './Paso2.module.css';
 
 export function Paso2() {
-  const { errores, resueltos, pendientesBloq, publicable, corregir, corregirTodo, aceptarDiferencia, ir } = useApp();
+  const { errores, resueltos, pendientesBloq, publicable, bitacora, corregir, corregirTodo, aceptarDiferencia, ir } = useApp();
   const [abierto, setAbierto] = useState<string | null>(null);
   const hayPorCorregir = errores.some((e) => !e.esIntercompania && !resueltos.includes(e.id));
 
@@ -39,7 +40,10 @@ export function Paso2() {
       </ul>
 
       <div className={css.pie}>
-        <span className={css.nota}>Cada corrección queda anotada en la bitácora.</span>
+        <div className={css.notaBitacora}>
+          <span className={css.nota}>Cada corrección queda anotada en la bitácora.</span>
+          <Bitacora entradas={bitacora} />
+        </div>
         <Boton disabled={!publicable} onClick={() => ir(3)}>
           Ver el resultado <IcoFlecha tam={18} />
         </Boton>

@@ -16,6 +16,7 @@
   border-top: 1px solid var(--neutro-bg);
 }
 .nota { font-size: 14px; color: var(--texto-3); }
+.notaBitacora { display: flex; flex-direction: column; gap: 2px; flex: 1 1 280px; }
 
 @media (max-width: 640px) {
   .paso { padding: 20px 16px; gap: 16px; }
